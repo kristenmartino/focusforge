@@ -9,32 +9,32 @@
 
 ## Import Order
 
-Epics first, then children — the `Epic Name` column in `children.csv` references the epic's `Epic Name` field so Jira creates the parent-child link.
+Epics first, then children. This is a **team-managed (next-gen)** Jira Cloud project, so parent-child linking uses the `Parent` field (not Epic Link/Epic Name).
 
 ### Step 1 — Import Epics
 
-1. **Jira > System > Import > CSV** — upload `epics.csv`
-2. Map columns:
+1. **Jira > Project Settings > Features** — confirm "Epics" is enabled
+2. **Jira > System > Import > CSV** — upload `epics.csv`
+3. Map columns:
    - Summary -> Summary
    - Issue Type -> Issue Type
-   - Epic Name -> Epic Name
    - Description -> Description
    - Priority -> Priority
    - Labels -> Labels
-3. Validate and import. Confirm 10 epics in the backlog.
+4. Validate and import. Confirm 10 epics in the backlog.
 
 ### Step 2 — Import Stories
 
 1. Upload `children.csv`
-2. Map columns (same as above — `Epic Name` maps to `Epic Name`):
+2. Map columns:
    - Summary -> Summary
    - Issue Type -> Issue Type
-   - Epic Name -> Epic Name
+   - Parent -> Parent (Jira matches by Summary of existing epics)
    - Description -> Description
    - Priority -> Priority
    - Labels -> Labels
-3. Verify every `Epic Name` value matches an existing epic's Epic Name exactly
-4. Import. Confirm 51 stories linked as children of the correct epics.
+3. Verify every `Parent` value matches an existing epic's Summary exactly
+4. Import. Confirm 51 stories appear as children of the correct epics.
 
 ## Post-Import
 
