@@ -1,0 +1,10 @@
+Summary,Issue Type,Description,Priority,Labels
+Timer & Sessions,Epic,"Core Pomodoro timer (Focus/Short Break/Long Break), background execution, notifications, session logging, and session history. Two-tap start flow. Timer drift < 1s over 30 min.",Highest,sprint-1-2
+Streaks & Rewards,Epic,"Daily streak tracking, milestone unlocks (3/7/14/30/60), XP and coin economy, streak freeze policy, and reward reveal animations.",Highest,sprint-1-2
+Character & Cosmetics,Epic,"Base character selection, trait customization, equipment slots, layered 2D sprite rendering, animations (idle/celebrate/focus/rest), inventory grid, coin purchases, rarity tiers, and launch catalog.",High,sprint-3-4
+Quests & Progress,Epic,"Daily and weekly quest system, quest rewards, stats dashboard (today/7-day/all-time), session history timeline, and milestone progress tracker.",High,sprint-3-4
+AI Coach,Epic,"On-device AI coaching across three waves. W1: intent framing, post-session reflection, streak rescue nudge. W2: adaptive duration and break recommendations. W3: character voice and weekly recaps. Offline-first with deterministic fallbacks.",High,sprint-5 ai
+Platform & Sync,Epic,"iPad layout adaptation, Split View/Slide Over support, CloudKit sync for all core models, merge conflict resolution, and offline-to-online recovery.",Medium,sprint-5
+Accessibility,Epic,"VoiceOver labels, Dynamic Type, WCAG AA contrast, reduce-motion alternatives, and full VoiceOver end-to-end verification.",High,sprint-6
+Release & QA,Epic,"P0/P1 defect resolution, crash-free rate >= 99.5% in beta, end-to-end flow verification on iPhone and iPad, App Store listing, and submission.",Highest,sprint-6
+Monetization,Epic,"FocusForge+ subscription via StoreKit 2 for premium stats and cosmetic tracks. Non-randomized cosmetic bundles. No ads during focus sessions.",Medium,post-mvp
