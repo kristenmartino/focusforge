@@ -1,4 +1,4 @@
-Summary,Issue Type,Epic Link,Description,Priority,Labels
+Summary,Issue Type,Epic Name,Description,Priority,Labels
 Build core countdown timer engine with background execution,Story,Timer & Sessions,"Timer engine that survives backgrounding, corrects for clock drift, and resumes accurately on foreground. Drift < 1s over 30 min.",Highest,sprint-1
 Implement session types and preset management,Story,Timer & Sessions,"Focus (25m), Short Break (5m), Long Break (15m after 4 focuses). Configurable durations with validated input. Persist TimerPreset model (SwiftData).",Highest,sprint-1
 Build timer UI with progress ring and controls,Story,Timer & Sessions,"Main timer screen: remaining time, session type indicator, progress ring, pause/resume/cancel buttons, task name display.",Highest,sprint-1

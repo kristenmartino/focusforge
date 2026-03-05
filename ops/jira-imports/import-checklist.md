@@ -9,7 +9,7 @@
 
 ## Import Order
 
-Epics first, then children — the `Epic Link` column in `children.csv` references epic Summaries.
+Epics first, then children — the `Epic Name` column in `children.csv` references the epic's `Epic Name` field so Jira creates the parent-child link.
 
 ### Step 1 — Import Epics
 
@@ -17,6 +17,7 @@ Epics first, then children — the `Epic Link` column in `children.csv` referenc
 2. Map columns:
    - Summary -> Summary
    - Issue Type -> Issue Type
+   - Epic Name -> Epic Name
    - Description -> Description
    - Priority -> Priority
    - Labels -> Labels
@@ -25,14 +26,19 @@ Epics first, then children — the `Epic Link` column in `children.csv` referenc
 ### Step 2 — Import Stories
 
 1. Upload `children.csv`
-2. Map columns (same as above, plus):
-   - Epic Link -> Epic Link
-3. Verify every `Epic Link` value matches an existing epic Summary exactly
-4. Import. Confirm 51 stories linked to correct epics.
+2. Map columns (same as above — `Epic Name` maps to `Epic Name`):
+   - Summary -> Summary
+   - Issue Type -> Issue Type
+   - Epic Name -> Epic Name
+   - Description -> Description
+   - Priority -> Priority
+   - Labels -> Labels
+3. Verify every `Epic Name` value matches an existing epic's Epic Name exactly
+4. Import. Confirm 51 stories linked as children of the correct epics.
 
 ## Post-Import
 
-- [ ] Spot-check epic links are correct
+- [ ] Spot-check stories are children of the correct epics
 - [ ] Drag stories into sprints using the `Labels` column as a guide
 - [ ] Set story point estimates during sprint planning
 - [ ] Assign owners
