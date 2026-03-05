@@ -1,2 +1,2 @@
-# focusforge
-Character-driven Pomodoro app that rewards focus streaks with customizable avatars, outfits, and AI coaching.
+# FocusForge
+FocusForge helps users build deep-work habits through Pomodoro sessions, streak progression, and character customization.
