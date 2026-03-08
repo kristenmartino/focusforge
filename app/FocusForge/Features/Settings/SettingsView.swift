@@ -4,9 +4,11 @@ import SwiftData
 struct SettingsView: View {
     @Query(filter: #Predicate<TimerPreset> { $0.isDefault == true })
     private var presets: [TimerPreset]
+    @Query private var streakStates: [StreakState]
     @Environment(\.modelContext) private var modelContext
 
     private var preset: TimerPreset? { presets.first }
+    private var streakState: StreakState? { streakStates.first }
 
     var body: some View {
         NavigationStack {
@@ -35,8 +37,30 @@ struct SettingsView: View {
                         )
                     }
                 }
+
+                Section {
+                    HStack {
+                        Label("Streak Freezes", systemImage: "snowflake")
+                        Spacer()
+                        Text("\(streakState?.freezesAvailable ?? 0) available")
+                            .foregroundStyle(.secondary)
+                    }
+                    if let state = streakState, state.freezesUsed > 0 {
+                        HStack {
+                            Text("Freezes used")
+                            Spacer()
+                            Text("\(state.freezesUsed)")
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                } header: {
+                    Text("Streak Freezes")
+                } footer: {
+                    Text("Streak freezes are earned at milestone days (3, 7, 14, 30, 60). When you miss a day, a freeze is automatically used to protect your streak.")
+                }
+
                 Section("About") {
-                    LabeledContent("Version", value: "0.1.0")
+                    LabeledContent("Version", value: "0.2.0")
                 }
             }
             .navigationTitle("Settings")
@@ -74,5 +98,5 @@ struct SettingsView: View {
 
 #Preview {
     SettingsView()
-        .modelContainer(for: TimerPreset.self, inMemory: true)
+        .modelContainer(for: [TimerPreset.self, StreakState.self], inMemory: true)
 }

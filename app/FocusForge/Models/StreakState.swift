@@ -11,6 +11,7 @@ final class StreakState {
     var totalXP: Int
     var totalCoins: Int
     var currentLevel: Int
+    var streakFreezeLastEarnedDate: Date?
 
     init(
         currentStreakDays: Int = 0,
@@ -20,7 +21,8 @@ final class StreakState {
         freezesUsed: Int = 0,
         totalXP: Int = 0,
         totalCoins: Int = 0,
-        currentLevel: Int = 1
+        currentLevel: Int = 1,
+        streakFreezeLastEarnedDate: Date? = nil
     ) {
         self.currentStreakDays = currentStreakDays
         self.longestStreakDays = longestStreakDays
@@ -30,5 +32,6 @@ final class StreakState {
         self.totalXP = totalXP
         self.totalCoins = totalCoins
         self.currentLevel = currentLevel
+        self.streakFreezeLastEarnedDate = streakFreezeLastEarnedDate
     }
 }

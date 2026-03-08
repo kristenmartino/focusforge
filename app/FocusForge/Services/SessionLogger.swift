@@ -1,9 +1,13 @@
 import Foundation
 import SwiftData
 
-struct RewardCalculation {
+struct SessionResult {
     let xp: Int
     let coins: Int
+    let streakDays: Int
+    let bonusXP: Int
+    let newMilestone: MilestoneReward?
+    let leveledUp: Bool
 }
 
 enum SessionLogger {
@@ -13,9 +17,22 @@ enum SessionLogger {
         plannedDuration: TimeInterval,
         startedAt: Date,
         in context: ModelContext
-    ) -> RewardCalculation {
-        let rewards = calculateRewards(for: sessionType, duration: plannedDuration)
+    ) -> SessionResult {
+        // 1. Update streak (only for focus sessions)
+        let streakDays: Int
+        if sessionType == .focus {
+            streakDays = StreakManager.recordFocusCompletion(in: context)
+        } else {
+            streakDays = StreakManager.currentStreakDays(in: context)
+        }
 
+        // 2. Calculate rewards with streak bonus
+        let base = calculateBaseRewards(for: sessionType, duration: plannedDuration)
+        let multiplier = StreakManager.streakBonusMultiplier(for: streakDays)
+        let bonusXP = sessionType == .focus ? Int(Double(base.xp) * multiplier) - base.xp : 0
+        let totalXP = base.xp + bonusXP
+
+        // 3. Log the session
         let log = SessionLog(
             taskName: taskName,
             sessionType: sessionType.toModelType,
@@ -24,13 +41,27 @@ enum SessionLogger {
             plannedDurationSeconds: Int(plannedDuration),
             actualDurationSeconds: Int(Date.now.timeIntervalSince(startedAt)),
             outcome: .completed,
-            xpEarned: rewards.xp,
-            coinsEarned: rewards.coins
+            xpEarned: totalXP,
+            coinsEarned: base.coins
         )
         context.insert(log)
-        updateStreakState(xp: rewards.xp, coins: rewards.coins, in: context)
+
+        // 4. Apply XP/coins and check level-up
+        let leveledUp = StreakManager.applyRewards(xp: totalXP, coins: base.coins, in: context)
+
+        // 5. Check milestones
+        let milestone = MilestoneEngine.checkMilestone(streakDays: streakDays, in: context)
+
         try? context.save()
-        return rewards
+
+        return SessionResult(
+            xp: totalXP,
+            coins: base.coins,
+            streakDays: streakDays,
+            bonusXP: bonusXP,
+            newMilestone: milestone,
+            leveledUp: leveledUp
+        )
     }
 
     static func logAbandonment(
@@ -56,28 +87,14 @@ enum SessionLogger {
         try? context.save()
     }
 
-    private static func calculateRewards(for type: SessionPhase, duration: TimeInterval) -> RewardCalculation {
+    private static func calculateBaseRewards(for type: SessionPhase, duration: TimeInterval) -> (xp: Int, coins: Int) {
         switch type {
         case .focus:
             let minutes = Int(duration / 60)
-            return RewardCalculation(xp: minutes, coins: minutes)
+            return (xp: minutes, coins: minutes)
         case .shortBreak, .longBreak:
-            return RewardCalculation(xp: 0, coins: 0)
+            return (xp: 0, coins: 0)
         }
-    }
-
-    private static func updateStreakState(xp: Int, coins: Int, in context: ModelContext) {
-        let descriptor = FetchDescriptor<StreakState>()
-        let states = (try? context.fetch(descriptor)) ?? []
-        let streakState: StreakState
-        if let existing = states.first {
-            streakState = existing
-        } else {
-            streakState = StreakState()
-            context.insert(streakState)
-        }
-        streakState.totalXP += xp
-        streakState.totalCoins += coins
     }
 }
 

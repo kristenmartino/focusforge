@@ -12,12 +12,16 @@ struct TimerView: View {
 
     @State private var taskName: String = ""
     @State private var showCompletion = false
-    @State private var completionRewards: RewardCalculation?
+    @State private var completionResult: SessionResult?
+    @State private var showMilestone = false
+    @State private var pendingMilestone: MilestoneReward?
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
                 Spacer()
+
+                StreakBadgeView()
 
                 Text(engine.currentSessionType.displayName)
                     .font(.title3)
@@ -56,6 +60,15 @@ struct TimerView: View {
                 Spacer()
             }
             .navigationTitle("Timer")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        SessionHistoryView()
+                    } label: {
+                        Image(systemName: "clock.arrow.circlepath")
+                    }
+                }
+            }
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
                     engine.recalculateOnForeground()
@@ -68,9 +81,20 @@ struct TimerView: View {
                 SessionCompletionView(
                     sessionType: engine.currentSessionType,
                     duration: engine.totalDuration,
-                    rewards: completionRewards ?? RewardCalculation(xp: 0, coins: 0),
+                    result: completionResult ?? SessionResult(
+                        xp: 0, coins: 0, streakDays: 0,
+                        bonusXP: 0, newMilestone: nil, leveledUp: false
+                    ),
                     onDismiss: dismissCompletion
                 )
+            }
+            .sheet(isPresented: $showMilestone) {
+                if let milestone = pendingMilestone {
+                    MilestoneUnlockView(milestone: milestone) {
+                        showMilestone = false
+                        pendingMilestone = nil
+                    }
+                }
             }
         }
     }
@@ -141,15 +165,20 @@ struct TimerView: View {
     }
 
     private func handleCompletion() {
-        let rewards = SessionLogger.logCompletion(
+        let result = SessionLogger.logCompletion(
             taskName: engine.taskName,
             sessionType: engine.currentSessionType,
             plannedDuration: engine.totalDuration,
             startedAt: Date.now.addingTimeInterval(-engine.totalDuration),
             in: modelContext
         )
-        completionRewards = rewards
+        completionResult = result
         showCompletion = true
+
+        // Queue milestone for after completion sheet dismissal
+        if let milestone = result.newMilestone {
+            pendingMilestone = milestone
+        }
     }
 
     private func dismissCompletion() {
@@ -164,6 +193,13 @@ struct TimerView: View {
         }
         engine.acknowledge()
         taskName = ""
+
+        // Show milestone after a brief delay so sheets don't conflict
+        if pendingMilestone != nil {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                showMilestone = true
+            }
+        }
     }
 }
 

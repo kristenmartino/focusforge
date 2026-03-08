@@ -3,7 +3,7 @@ import SwiftUI
 struct SessionCompletionView: View {
     let sessionType: SessionPhase
     let duration: TimeInterval
-    let rewards: RewardCalculation
+    let result: SessionResult
     let onDismiss: () -> Void
 
     var body: some View {
@@ -22,18 +22,57 @@ struct SessionCompletionView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
-            if rewards.xp > 0 || rewards.coins > 0 {
-                HStack(spacing: 24) {
-                    if rewards.xp > 0 {
-                        Label("\(rewards.xp) XP", systemImage: "star.fill")
-                            .foregroundStyle(.yellow)
-                    }
-                    if rewards.coins > 0 {
-                        Label("\(rewards.coins) Coins", systemImage: "circle.fill")
-                            .foregroundStyle(.orange)
-                    }
+            if result.streakDays > 0 {
+                HStack(spacing: 4) {
+                    Image(systemName: "flame.fill")
+                        .foregroundStyle(.orange)
+                    Text("Day \(result.streakDays) streak!")
                 }
                 .font(.headline)
+            }
+
+            if result.xp > 0 || result.coins > 0 {
+                VStack(spacing: 8) {
+                    HStack(spacing: 24) {
+                        if result.xp > 0 {
+                            Label("\(result.xp) XP", systemImage: "star.fill")
+                                .foregroundStyle(.yellow)
+                        }
+                        if result.coins > 0 {
+                            Label("\(result.coins) Coins", systemImage: "circle.fill")
+                                .foregroundStyle(.orange)
+                        }
+                    }
+                    .font(.headline)
+
+                    if result.bonusXP > 0 {
+                        Text("+\(result.bonusXP) streak bonus XP")
+                            .font(.caption)
+                            .foregroundStyle(.yellow.opacity(0.8))
+                    }
+                }
+            }
+
+            if result.leveledUp {
+                Label("Level Up!", systemImage: "arrow.up.circle.fill")
+                    .font(.headline)
+                    .foregroundStyle(.cyan)
+            }
+
+            if let milestone = result.newMilestone {
+                VStack(spacing: 4) {
+                    Divider()
+                        .padding(.horizontal)
+                    HStack(spacing: 4) {
+                        Image(systemName: "trophy.fill")
+                        Text(milestone.name)
+                    }
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.purple)
+                    Text("New item unlocked!")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
 
             Spacer()
@@ -53,7 +92,14 @@ struct SessionCompletionView: View {
     SessionCompletionView(
         sessionType: .focus,
         duration: 1500,
-        rewards: RewardCalculation(xp: 25, coins: 25),
+        result: SessionResult(
+            xp: 30,
+            coins: 25,
+            streakDays: 3,
+            bonusXP: 5,
+            newMilestone: nil,
+            leveledUp: false
+        ),
         onDismiss: {}
     )
 }
