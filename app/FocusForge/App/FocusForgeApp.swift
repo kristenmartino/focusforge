@@ -56,6 +56,7 @@ struct AppRootView: View {
         }
         .task {
             PresetManager.ensureDefaultPreset(in: modelContext)
+            CharacterCatalog.seedInventory(in: modelContext)
             await notificationService.checkCurrentStatus()
         }
     }

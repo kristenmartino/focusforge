@@ -6,7 +6,7 @@ struct OnboardingContainerView: View {
     @Environment(NotificationService.self) private var notificationService
 
     @State private var currentStep = 0
-    @State private var selectedCharacterID = "default"
+    @State private var selectedCharacterID = "spark"
 
     var body: some View {
         TabView(selection: $currentStep) {
@@ -33,6 +33,13 @@ struct OnboardingContainerView: View {
             notificationPermissionRequested: true
         )
         modelContext.insert(profile)
+
+        // Create character loadout from selected preset
+        if let preset = CharacterCatalog.presets.first(where: { $0.id == selectedCharacterID }) {
+            let loadout = CharacterCatalog.createLoadout(from: preset)
+            modelContext.insert(loadout)
+        }
+
         try? modelContext.save()
     }
 }

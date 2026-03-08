@@ -65,12 +65,9 @@ struct MilestoneUnlockView: View {
 
     private var slotIcon: String {
         switch milestone.itemSlot {
-        case .head: return "crown.fill"
-        case .accessory: return "star.circle.fill"
-        case .top: return "tshirt.fill"
-        case .bottom: return "figure.stand"
-        case .fullBody: return "person.fill"
-        case .trait: return "sparkles"
+        case .horns: return "crown.fill"
+        case .wings: return "wind"
+        case .weapon: return "shield.fill"
         }
     }
 }
@@ -81,9 +78,9 @@ struct MilestoneUnlockView: View {
             milestoneID: "streak_3",
             name: "Early Bird",
             streakDay: 3,
-            itemID: "milestone_early_bird",
-            itemName: "Early Bird Badge",
-            itemSlot: .accessory,
+            itemID: "horn1",
+            itemName: "Imp Points",
+            itemSlot: .horns,
             itemRarity: .common,
             freezeGranted: 1
         ),

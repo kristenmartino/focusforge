@@ -4,11 +4,7 @@ struct CharacterSelectionStepView: View {
     @Binding var selectedID: String
     let onContinue: () -> Void
 
-    private let characters = [
-        ("default", "person.fill", "Explorer"),
-        ("scholar", "book.fill", "Scholar"),
-        ("builder", "hammer.fill", "Builder"),
-    ]
+    private let presets = CharacterCatalog.presets
 
     var body: some View {
         VStack(spacing: 24) {
@@ -21,30 +17,32 @@ struct CharacterSelectionStepView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
-            HStack(spacing: 20) {
-                ForEach(characters, id: \.0) { id, icon, name in
+            HStack(spacing: 16) {
+                ForEach(presets) { preset in
                     Button {
-                        selectedID = id
+                        selectedID = preset.id
                     } label: {
                         VStack(spacing: 8) {
-                            Image(systemName: icon)
-                                .font(.system(size: 40))
-                                .frame(width: 80, height: 80)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 16)
-                                        .fill(selectedID == id ? Color.accentColor.opacity(0.15) : Color.secondary.opacity(0.1))
-                                )
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 16)
-                                        .stroke(selectedID == id ? Color.accentColor : Color.clear, lineWidth: 2)
-                                )
-                            Text(name)
+                            CharacterSpriteView(
+                                loadout: CharacterCatalog.createLoadout(from: preset),
+                                size: 90
+                            )
+                            .frame(width: 100, height: 100)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(selectedID == preset.id ? Color.accentColor.opacity(0.15) : Color.secondary.opacity(0.1))
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(selectedID == preset.id ? Color.accentColor : Color.clear, lineWidth: 2)
+                            )
+                            Text(preset.name)
                                 .font(.caption)
                         }
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("\(name) character")
-                    .accessibilityAddTraits(selectedID == id ? .isSelected : [])
+                    .accessibilityLabel("\(preset.name) character")
+                    .accessibilityAddTraits(selectedID == preset.id ? .isSelected : [])
                 }
             }
 
@@ -61,9 +59,14 @@ struct CharacterSelectionStepView: View {
 
             Spacer()
         }
+        .onAppear {
+            if selectedID.isEmpty || !presets.contains(where: { $0.id == selectedID }) {
+                selectedID = presets[0].id
+            }
+        }
     }
 }
 
 #Preview {
-    CharacterSelectionStepView(selectedID: .constant("default"), onContinue: {})
+    CharacterSelectionStepView(selectedID: .constant("spark"), onContinue: {})
 }

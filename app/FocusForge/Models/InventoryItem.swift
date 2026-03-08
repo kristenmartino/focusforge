@@ -2,12 +2,9 @@ import Foundation
 import SwiftData
 
 enum ItemSlot: String, Codable {
-    case head
-    case top
-    case bottom
-    case fullBody
-    case accessory
-    case trait
+    case horns
+    case wings
+    case weapon
 }
 
 enum ItemRarity: String, Codable {
@@ -35,7 +32,7 @@ final class InventoryItem {
     init(
         itemID: String,
         name: String = "",
-        slot: ItemSlot = .accessory,
+        slot: ItemSlot = .horns,
         rarity: ItemRarity = .common,
         ownership: ItemOwnership = .locked,
         coinCost: Int = 0,

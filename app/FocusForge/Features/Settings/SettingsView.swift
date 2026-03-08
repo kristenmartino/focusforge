@@ -59,8 +59,45 @@ struct SettingsView: View {
                     Text("Streak freezes are earned at milestone days (3, 7, 14, 30, 60). When you miss a day, a freeze is automatically used to protect your streak.")
                 }
 
+                #if DEBUG
+                Section("Debug") {
+                    Button("Grant 500 Coins") {
+                        let state = StreakManager.fetchOrCreateStreakState(in: modelContext)
+                        state.totalCoins += 500
+                    }
+                    Button("Set Streak to Day 3 (Early Bird)") {
+                        let state = StreakManager.fetchOrCreateStreakState(in: modelContext)
+                        state.currentStreakDays = 3
+                        state.lastCompletedDate = .now
+                        if let reward = MilestoneEngine.checkMilestone(streakDays: 3, in: modelContext) {
+                            try? modelContext.save()
+                        }
+                    }
+                    Button("Set Streak to Day 7 (Week Warrior)") {
+                        let state = StreakManager.fetchOrCreateStreakState(in: modelContext)
+                        state.currentStreakDays = 7
+                        state.lastCompletedDate = .now
+                        if let reward = MilestoneEngine.checkMilestone(streakDays: 7, in: modelContext) {
+                            try? modelContext.save()
+                        }
+                    }
+                    HStack {
+                        Text("Coins")
+                        Spacer()
+                        Text("\(streakState?.totalCoins ?? 0)")
+                            .foregroundStyle(.secondary)
+                    }
+                    HStack {
+                        Text("Streak")
+                        Spacer()
+                        Text("Day \(streakState?.currentStreakDays ?? 0)")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                #endif
+
                 Section("About") {
-                    LabeledContent("Version", value: "0.2.0")
+                    LabeledContent("Version", value: "0.3.0")
                 }
             }
             .navigationTitle("Settings")
