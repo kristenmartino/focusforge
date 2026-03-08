@@ -69,6 +69,12 @@ struct TimerView: View {
                     }
                 }
             }
+            .onAppear {
+                syncPresetToEngine()
+            }
+            .onChange(of: presetDurations) { _, _ in
+                syncPresetToEngine()
+            }
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
                     engine.recalculateOnForeground()
@@ -97,6 +103,20 @@ struct TimerView: View {
                 }
             }
         }
+    }
+
+    private var presetDurations: [Int] {
+        guard let preset = presets.first else { return [] }
+        return [preset.focusDurationSeconds, preset.shortBreakDurationSeconds, preset.longBreakDurationSeconds]
+    }
+
+    private func syncPresetToEngine() {
+        guard engine.state == .idle, let preset = presets.first else { return }
+        engine.loadPreset(
+            focusSeconds: preset.focusDurationSeconds,
+            shortBreakSeconds: preset.shortBreakDurationSeconds,
+            longBreakSeconds: preset.longBreakDurationSeconds
+        )
     }
 
     private func startSession() {
@@ -185,13 +205,15 @@ struct TimerView: View {
         showCompletion = false
         if let preset = presets.first {
             engine.prepareNextSession(sessionsBeforeLongBreak: preset.sessionsBeforeLongBreak)
+            engine.acknowledge()
             engine.loadPreset(
                 focusSeconds: preset.focusDurationSeconds,
                 shortBreakSeconds: preset.shortBreakDurationSeconds,
                 longBreakSeconds: preset.longBreakDurationSeconds
             )
+        } else {
+            engine.acknowledge()
         }
-        engine.acknowledge()
         taskName = ""
 
         // Show milestone after a brief delay so sheets don't conflict
