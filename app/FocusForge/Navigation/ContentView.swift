@@ -1,6 +1,10 @@
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
+    @Query(filter: #Predicate<QuestProgress> { $0.isCompleted && !$0.isClaimed })
+    private var claimableQuests: [QuestProgress]
+
     var body: some View {
         TabView {
             TimerView()
@@ -15,17 +19,24 @@ struct ContentView: View {
                 }
                 .tag(1)
 
+            QuestListView()
+                .tabItem {
+                    Label("Quests", systemImage: "scroll")
+                }
+                .tag(2)
+                .badge(claimableQuests.count)
+
             StatsView()
                 .tabItem {
                     Label("Stats", systemImage: "chart.bar.fill")
                 }
-                .tag(2)
+                .tag(3)
 
             SettingsView()
                 .tabItem {
                     Label("Settings", systemImage: "gearshape.fill")
                 }
-                .tag(3)
+                .tag(4)
         }
     }
 }
@@ -36,5 +47,6 @@ struct ContentView: View {
             UserProfile.self,
             TimerPreset.self,
             SessionLog.self,
+            QuestProgress.self,
         ], inMemory: true)
 }

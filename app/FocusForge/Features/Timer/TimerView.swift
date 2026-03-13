@@ -89,7 +89,8 @@ struct TimerView: View {
                     duration: engine.totalDuration,
                     result: completionResult ?? SessionResult(
                         xp: 0, coins: 0, streakDays: 0,
-                        bonusXP: 0, newMilestone: nil, leveledUp: false
+                        bonusXP: 0, newMilestone: nil, leveledUp: false,
+                        completedQuests: []
                     ),
                     onDismiss: dismissCompletion
                 )

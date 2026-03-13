@@ -75,6 +75,24 @@ struct SessionCompletionView: View {
                 }
             }
 
+            if !result.completedQuests.isEmpty {
+                VStack(spacing: 4) {
+                    Divider()
+                        .padding(.horizontal)
+                    ForEach(result.completedQuests, id: \.questID) { quest in
+                        HStack(spacing: 4) {
+                            Image(systemName: "scroll.fill")
+                            Text("Quest complete: \(quest.title)")
+                        }
+                        .font(.subheadline.bold())
+                        .foregroundStyle(.cyan)
+                    }
+                    Text("Claim rewards in the Quests tab")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
             Spacer()
 
             Button("Continue", action: onDismiss)
@@ -98,7 +116,8 @@ struct SessionCompletionView: View {
             streakDays: 3,
             bonusXP: 5,
             newMilestone: nil,
-            leveledUp: false
+            leveledUp: false,
+            completedQuests: []
         ),
         onDismiss: {}
     )

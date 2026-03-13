@@ -45,6 +45,7 @@ struct AppRootView: View {
     @Query private var profiles: [UserProfile]
     @Environment(\.modelContext) private var modelContext
     @Environment(NotificationService.self) private var notificationService
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         Group {
@@ -57,7 +58,13 @@ struct AppRootView: View {
         .task {
             PresetManager.ensureDefaultPreset(in: modelContext)
             CharacterCatalog.seedInventory(in: modelContext)
+            QuestManager.ensureActiveQuests(in: modelContext)
             await notificationService.checkCurrentStatus()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                QuestManager.ensureActiveQuests(in: modelContext)
+            }
         }
     }
 }

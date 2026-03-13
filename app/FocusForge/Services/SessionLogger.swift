@@ -8,6 +8,7 @@ struct SessionResult {
     let bonusXP: Int
     let newMilestone: MilestoneReward?
     let leveledUp: Bool
+    let completedQuests: [QuestProgress]
 }
 
 enum SessionLogger {
@@ -52,6 +53,15 @@ enum SessionLogger {
         // 5. Check milestones
         let milestone = MilestoneEngine.checkMilestone(streakDays: streakDays, in: context)
 
+        // 6. Track quest progress
+        let focusMinutes = sessionType == .focus ? Int(plannedDuration / 60) : 0
+        let completedQuests = QuestManager.trackSessionCompletion(
+            focusMinutes: focusMinutes,
+            wasAbandoned: false,
+            streakDays: streakDays,
+            in: context
+        )
+
         try? context.save()
 
         return SessionResult(
@@ -60,7 +70,8 @@ enum SessionLogger {
             streakDays: streakDays,
             bonusXP: bonusXP,
             newMilestone: milestone,
-            leveledUp: leveledUp
+            leveledUp: leveledUp,
+            completedQuests: completedQuests
         )
     }
 

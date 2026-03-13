@@ -1,27 +1,51 @@
 import SwiftUI
 import SwiftData
 
+enum StatsPeriod: String, CaseIterable {
+    case today = "Today"
+    case week = "7-Day"
+    case allTime = "All Time"
+}
+
 struct StatsView: View {
-    @Query private var sessions: [SessionLog]
+    @State private var selectedPeriod: StatsPeriod = .today
 
     var body: some View {
         NavigationStack {
-            VStack {
-                Spacer()
-                Image(systemName: "chart.bar.fill")
-                    .font(.system(size: 80))
-                    .foregroundStyle(.secondary)
-                Text("Stats & insights coming soon")
-                    .font(.subheadline)
-                    .foregroundStyle(.tertiary)
-                Spacer()
+            VStack(spacing: 0) {
+                Picker("Period", selection: $selectedPeriod) {
+                    ForEach(StatsPeriod.allCases, id: \.self) {
+                        Text($0.rawValue).tag($0)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+                .padding(.top, 8)
+
+                switch selectedPeriod {
+                case .today:
+                    TodayStatsView()
+                case .week:
+                    WeeklyStatsView()
+                case .allTime:
+                    AllTimeStatsView()
+                }
             }
             .navigationTitle("Stats")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        MilestoneTrackerView()
+                    } label: {
+                        Image(systemName: "trophy")
+                    }
+                }
+            }
         }
     }
 }
 
 #Preview {
     StatsView()
-        .modelContainer(for: SessionLog.self, inMemory: true)
+        .modelContainer(for: [SessionLog.self, StreakState.self, UnlockEvent.self], inMemory: true)
 }
