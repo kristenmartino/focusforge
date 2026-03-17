@@ -5,6 +5,7 @@ import Observation
 final class NotificationService {
     private let center = UNUserNotificationCenter.current()
     private let timerNotificationID = "focusforge.timer.completion"
+    private let nudgeNotificationID = "focusforge.streak.nudge"
 
     private(set) var isAuthorized: Bool = false
 
@@ -54,5 +55,27 @@ final class NotificationService {
 
     func cancelPending() {
         center.removePendingNotificationRequests(withIdentifiers: [timerNotificationID])
+    }
+
+    func scheduleStreakNudge(title: String, body: String) {
+        guard isAuthorized else { return }
+
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = .default
+
+        // Fire in 1 second (immediate nudge)
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        let request = UNNotificationRequest(
+            identifier: nudgeNotificationID,
+            content: content,
+            trigger: trigger
+        )
+        center.add(request)
+    }
+
+    func cancelStreakNudge() {
+        center.removePendingNotificationRequests(withIdentifiers: [nudgeNotificationID])
     }
 }

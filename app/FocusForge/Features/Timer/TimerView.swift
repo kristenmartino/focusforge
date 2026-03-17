@@ -9,12 +9,16 @@ struct TimerView: View {
 
     @Query(filter: #Predicate<TimerPreset> { $0.isDefault == true })
     private var presets: [TimerPreset]
+    @Query private var coachPreferences: [AICoachPreference]
 
     @State private var taskName: String = ""
     @State private var showCompletion = false
     @State private var completionResult: SessionResult?
+    @State private var completionReflection: ReflectionResult?
     @State private var showMilestone = false
     @State private var pendingMilestone: MilestoneReward?
+    @State private var showIntentFraming = false
+    @State private var currentFraming: FramingResult?
 
     var body: some View {
         NavigationStack {
@@ -83,7 +87,25 @@ struct TimerView: View {
             .onChange(of: engine.state) { oldState, newState in
                 handleStateChange(from: oldState, to: newState)
             }
-            .sheet(isPresented: $showCompletion) {
+            .sheet(isPresented: $showIntentFraming) {
+                if let framing = currentFraming {
+                    IntentFramingView(
+                        framing: framing,
+                        onAccept: { acceptedTask in
+                            logFramingInteraction(templateID: framing.templateID, outcome: .accepted)
+                            showIntentFraming = false
+                            taskName = acceptedTask
+                            startSessionDirectly()
+                        },
+                        onSkip: {
+                            logFramingInteraction(templateID: framing.templateID, outcome: .dismissed)
+                            showIntentFraming = false
+                            startSessionDirectly()
+                        }
+                    )
+                }
+            }
+            .sheet(isPresented: $showCompletion, onDismiss: dismissCompletion) {
                 SessionCompletionView(
                     sessionType: engine.currentSessionType,
                     duration: engine.totalDuration,
@@ -92,6 +114,15 @@ struct TimerView: View {
                         bonusXP: 0, newMilestone: nil, leveledUp: false,
                         completedQuests: []
                     ),
+                    reflection: completionReflection,
+                    onReflectionFeedback: { accepted in
+                        if let reflection = completionReflection {
+                            logReflectionInteraction(
+                                templateID: reflection.templateID,
+                                outcome: accepted ? .accepted : .dismissed
+                            )
+                        }
+                    },
                     onDismiss: dismissCompletion
                 )
             }
@@ -121,6 +152,29 @@ struct TimerView: View {
     }
 
     private func startSession() {
+        guard presets.first != nil else { return }
+
+        // Intent framing: only for focus sessions with a task name
+        let preference = coachPreferences.first
+        let framingEnabled = preference?.aiCoachEnabled == true && preference?.intentFramingEnabled == true
+
+        if engine.currentSessionType == .focus && framingEnabled && !taskName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            let signal = BehaviorSignalComputer.compute(in: modelContext)
+            let tone = preference?.tone ?? .encouraging
+            let framing = CoachTemplateEngine.selectFramingTemplate(
+                taskName: taskName,
+                signal: signal,
+                tone: tone,
+                in: modelContext
+            )
+            currentFraming = framing
+            showIntentFraming = true
+        } else {
+            startSessionDirectly()
+        }
+    }
+
+    private func startSessionDirectly() {
         guard let preset = presets.first else { return }
 
         let duration: TimeInterval
@@ -194,6 +248,28 @@ struct TimerView: View {
             in: modelContext
         )
         completionResult = result
+
+        // Compute reflection if enabled
+        let preference = coachPreferences.first
+        let reflectionEnabled = preference?.aiCoachEnabled == true && preference?.postReflectionEnabled == true
+
+        if reflectionEnabled && engine.currentSessionType == .focus {
+            let signal = BehaviorSignalComputer.compute(in: modelContext)
+            let tone = preference?.tone ?? .encouraging
+            let actualMinutes = Int(engine.totalDuration / 60)
+            let plannedMinutes = actualMinutes
+            completionReflection = CoachTemplateEngine.selectReflectionTemplate(
+                outcome: .completed,
+                actualMinutes: actualMinutes,
+                plannedMinutes: plannedMinutes,
+                signal: signal,
+                tone: tone,
+                in: modelContext
+            )
+        } else {
+            completionReflection = nil
+        }
+
         showCompletion = true
 
         // Queue milestone for after completion sheet dismissal
@@ -204,6 +280,7 @@ struct TimerView: View {
 
     private func dismissCompletion() {
         showCompletion = false
+        guard engine.state == .completed else { return }
         if let preset = presets.first {
             engine.prepareNextSession(sessionsBeforeLongBreak: preset.sessionsBeforeLongBreak)
             engine.acknowledge()
@@ -223,6 +300,26 @@ struct TimerView: View {
                 showMilestone = true
             }
         }
+    }
+
+    private func logFramingInteraction(templateID: String, outcome: AIInteractionOutcome) {
+        let log = AIInteractionLog(
+            featureType: .framing,
+            templateID: templateID,
+            outcome: outcome
+        )
+        modelContext.insert(log)
+        try? modelContext.save()
+    }
+
+    private func logReflectionInteraction(templateID: String, outcome: AIInteractionOutcome) {
+        let log = AIInteractionLog(
+            featureType: .reflection,
+            templateID: templateID,
+            outcome: outcome
+        )
+        modelContext.insert(log)
+        try? modelContext.save()
     }
 }
 

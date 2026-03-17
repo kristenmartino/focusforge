@@ -6,6 +6,7 @@ struct SettingsView: View {
     private var presets: [TimerPreset]
     @Query private var streakStates: [StreakState]
     @Environment(\.modelContext) private var modelContext
+    @State private var debugSignalText: String = ""
 
     private var preset: TimerPreset? { presets.first }
     private var streakState: StreakState? { streakStates.first }
@@ -59,6 +60,14 @@ struct SettingsView: View {
                     Text("Streak freezes are earned at milestone days (3, 7, 14, 30, 60). When you miss a day, a freeze is automatically used to protect your streak.")
                 }
 
+                Section("AI Coach") {
+                    NavigationLink {
+                        AICoachSettingsView()
+                    } label: {
+                        Label("AI Coach Settings", systemImage: "brain.head.profile")
+                    }
+                }
+
                 #if DEBUG
                 Section("Debug") {
                     Button("Grant 500 Coins") {
@@ -93,11 +102,33 @@ struct SettingsView: View {
                         Text("Day \(streakState?.currentStreakDays ?? 0)")
                             .foregroundStyle(.secondary)
                     }
+                    Button("Trigger Streak Risk (Yesterday Evening)") {
+                        let state = StreakManager.fetchOrCreateStreakState(in: modelContext)
+                        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: .now)!
+                        let yesterdayEvening = Calendar.current.date(bySettingHour: 21, minute: 0, second: 0, of: yesterday)!
+                        state.lastCompletedDate = yesterdayEvening
+                        if state.currentStreakDays == 0 { state.currentStreakDays = 3 }
+                    }
+                    Button("Show Behavior Signal") {
+                        let signal = BehaviorSignalComputer.compute(in: modelContext)
+                        debugSignalText = String(format: "Completion: %.0f%% | Abandon: %.0f%% | Avg: %.0fmin | Risk: %.2f | Sessions: %d",
+                            signal.completionRate7d * 100,
+                            signal.abandonRate7d * 100,
+                            signal.avgActualFocusMinutes,
+                            signal.streakRiskScore,
+                            signal.totalSessions7d
+                        )
+                    }
+                    if !debugSignalText.isEmpty {
+                        Text(debugSignalText)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 #endif
 
                 Section("About") {
-                    LabeledContent("Version", value: "0.3.0")
+                    LabeledContent("Version", value: "0.4.0")
                 }
             }
             .navigationTitle("Settings")

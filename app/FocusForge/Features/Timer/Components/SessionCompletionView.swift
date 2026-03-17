@@ -4,6 +4,8 @@ struct SessionCompletionView: View {
     let sessionType: SessionPhase
     let duration: TimeInterval
     let result: SessionResult
+    var reflection: ReflectionResult? = nil
+    var onReflectionFeedback: ((Bool) -> Void)? = nil
     let onDismiss: () -> Void
 
     var body: some View {
@@ -93,6 +95,15 @@ struct SessionCompletionView: View {
                 }
             }
 
+            if let reflection {
+                PostReflectionCardView(
+                    reflection: reflection,
+                    onFeedback: { accepted in
+                        onReflectionFeedback?(accepted)
+                    }
+                )
+            }
+
             Spacer()
 
             Button("Continue", action: onDismiss)
@@ -103,6 +114,7 @@ struct SessionCompletionView: View {
         }
         .padding()
         .presentationDetents([.medium])
+        .interactiveDismissDisabled()
     }
 }
 
