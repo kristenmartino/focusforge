@@ -5,25 +5,33 @@ struct QuestRowView: View {
     let onClaim: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: FFTheme.Spacing.xs) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(quest.title)
-                        .font(.body.bold())
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(FFTheme.Text.primary)
                     Text(quest.questDescription)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(FFTheme.Text.tertiary)
                 }
                 Spacer()
 
                 if quest.isClaimed {
                     Image(systemName: "checkmark.seal.fill")
-                        .foregroundStyle(.green)
+                        .foregroundStyle(FFTheme.Accent.green)
                         .font(.title3)
                 } else if quest.isCompleted {
                     Button("Claim", action: onClaim)
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.small)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(FFTheme.Accent.purple)
+                        )
+                        .buttonStyle(.plain)
                 }
             }
 
@@ -32,24 +40,32 @@ struct QuestRowView: View {
                     value: Double(min(quest.currentCount, quest.targetCount)),
                     total: Double(quest.targetCount)
                 )
-                .tint(quest.isCompleted ? .green : .accentColor)
+                .tint(quest.isCompleted ? FFTheme.Accent.green : FFTheme.Accent.blue)
             }
 
-            HStack(spacing: 12) {
+            HStack(spacing: FFTheme.Spacing.sm) {
                 if quest.rewardXP > 0 {
-                    Label("\(quest.rewardXP) XP", systemImage: "star.fill")
-                        .font(.caption)
-                        .foregroundStyle(.yellow)
+                    HStack(spacing: 3) {
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 10))
+                        Text("\(quest.rewardXP) XP")
+                            .font(.caption)
+                    }
+                    .foregroundStyle(FFTheme.Accent.gold)
                 }
                 if quest.rewardCoins > 0 {
-                    Label("\(quest.rewardCoins) Coins", systemImage: "circle.fill")
-                        .font(.caption)
-                        .foregroundStyle(.orange)
+                    HStack(spacing: 3) {
+                        Image(systemName: "circle.fill")
+                            .font(.system(size: 10))
+                        Text("\(quest.rewardCoins) Coins")
+                            .font(.caption)
+                    }
+                    .foregroundStyle(FFTheme.Accent.orange)
                 }
                 Spacer()
                 Text("\(min(quest.currentCount, quest.targetCount))/\(quest.targetCount)")
                     .font(.caption.monospacedDigit())
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(FFTheme.Text.tertiary)
             }
         }
         .padding(.vertical, 4)

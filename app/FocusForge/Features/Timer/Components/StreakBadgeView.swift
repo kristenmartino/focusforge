@@ -12,18 +12,30 @@ struct StreakBadgeView: View {
         if streakDays > 0 {
             HStack(spacing: 4) {
                 Image(systemName: "flame.fill")
-                    .foregroundStyle(.orange)
-                Text("\(streakDays) day\(streakDays == 1 ? "" : "s")")
+                    .foregroundStyle(FFTheme.Accent.orange)
+                    .font(.system(size: 12))
+                Text("Day \(streakDays)")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(FFTheme.Accent.orange)
             }
-            .font(.subheadline.bold())
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
-            .background(.orange.opacity(0.15), in: Capsule())
+            .background(
+                Capsule()
+                    .fill(FFTheme.Accent.orange.opacity(0.10))
+                    .overlay(
+                        Capsule()
+                            .stroke(FFTheme.Accent.orange.opacity(0.20), lineWidth: 0.5)
+                    )
+            )
         }
     }
 }
 
 #Preview {
-    StreakBadgeView()
-        .modelContainer(for: StreakState.self, inMemory: true)
+    ZStack {
+        FocusBackground()
+        StreakBadgeView()
+    }
+    .modelContainer(for: StreakState.self, inMemory: true)
 }

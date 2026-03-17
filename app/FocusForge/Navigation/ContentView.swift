@@ -57,6 +57,8 @@ struct ContentView: View {
                     }
                     .tag(4)
             }
+            .darkTabBarAppearance()
+            .tint(FFTheme.Accent.blue)
 
             if shouldShowBanner {
                 StreakRescueBannerView(
@@ -74,6 +76,7 @@ struct ContentView: View {
             }
         }
         .animation(.easeInOut(duration: 0.3), value: shouldShowBanner)
+        .preferredColorScheme(.dark)
     }
 }
 

@@ -22,67 +22,87 @@ struct TimerView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
-                Spacer()
-
-                StreakBadgeView()
-
-                Text(engine.currentSessionType.displayName)
-                    .font(.title3)
-                    .foregroundStyle(.secondary)
-
-                ZStack {
-                    ProgressRingView(
-                        progress: engine.progress,
-                        lineWidth: 12,
-                        sessionType: engine.currentSessionType
-                    )
-                    .frame(width: 260, height: 260)
-
-                    Text(engine.formattedTime)
-                        .font(.system(size: 56, weight: .light, design: .monospaced))
-                        .monospacedDigit()
-                        .contentTransition(.numericText())
-                        .accessibilityLabel("Time remaining: \(engine.accessibleTimeDescription)")
-                }
-
-                if engine.state == .idle {
-                    TaskNameInputView(taskName: $taskName)
-                } else if !taskName.isEmpty {
-                    Text(taskName)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-
-                Spacer()
-
-                TimerControlsView(
-                    onStart: startSession,
-                    onCancel: cancelSession
+            ZStack {
+                // Atmospheric background
+                FocusBackground(
+                    accentColor: FFTheme.sessionColor(for: engine.currentSessionType)
                 )
 
-                Spacer()
+                // Content
+                VStack(spacing: 0) {
+                    Spacer()
+
+                    // Streak badge
+                    StreakBadgeView()
+                        .padding(.bottom, FFTheme.Spacing.sm)
+
+                    // Session type label
+                    Text(engine.currentSessionType.displayName.uppercased())
+                        .font(.sessionLabel)
+                        .foregroundStyle(FFTheme.Text.tertiary)
+                        .tracking(2)
+                        .padding(.bottom, FFTheme.Spacing.lg)
+
+                    // Timer ring + display
+                    ZStack {
+                        GlowProgressRingView(
+                            progress: engine.progress,
+                            sessionType: engine.currentSessionType
+                        )
+
+                        VStack(spacing: 4) {
+                            Text(engine.formattedTime)
+                                .font(.timerDisplay)
+                                .foregroundStyle(FFTheme.Text.primary)
+                                .monospacedDigit()
+                                .contentTransition(.numericText())
+                                .accessibilityLabel(
+                                    "Time remaining: \(engine.accessibleTimeDescription)"
+                                )
+                        }
+                    }
+                    .padding(.bottom, FFTheme.Spacing.lg)
+
+                    // Task name
+                    if engine.state == .idle {
+                        taskNameField
+                    } else if !taskName.isEmpty {
+                        Text(taskName)
+                            .font(.subheadline)
+                            .foregroundStyle(FFTheme.Text.tertiary)
+                    }
+
+                    Spacer()
+
+                    // Controls
+                    timerControls
+                        .padding(.bottom, FFTheme.Spacing.xxxl)
+
+                    Spacer()
+                }
             }
-            .navigationTitle("Timer")
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Text("Timer")
+                        .font(.headline)
+                        .foregroundStyle(FFTheme.Text.primary)
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink {
                         SessionHistoryView()
                     } label: {
                         Image(systemName: "clock.arrow.circlepath")
+                            .foregroundStyle(FFTheme.Text.secondary)
                     }
                 }
             }
-            .onAppear {
-                syncPresetToEngine()
-            }
-            .onChange(of: presetDurations) { _, _ in
-                syncPresetToEngine()
-            }
+            .darkNavigationAppearance()
+            .onAppear { syncPresetToEngine() }
+            .onChange(of: presetDurations) { _, _ in syncPresetToEngine() }
             .onChange(of: scenePhase) { _, newPhase in
-                if newPhase == .active {
-                    engine.recalculateOnForeground()
-                }
+                if newPhase == .active { engine.recalculateOnForeground() }
             }
             .onChange(of: engine.state) { oldState, newState in
                 handleStateChange(from: oldState, to: newState)
@@ -125,6 +145,7 @@ struct TimerView: View {
                     },
                     onDismiss: dismissCompletion
                 )
+                .presentationBackground(Color.clear)
             }
             .sheet(isPresented: $showMilestone) {
                 if let milestone = pendingMilestone {
@@ -132,14 +153,177 @@ struct TimerView: View {
                         showMilestone = false
                         pendingMilestone = nil
                     }
+                    .presentationBackground(Color.clear)
                 }
             }
         }
     }
 
+    // MARK: - Task Name Field
+
+    private var taskNameField: some View {
+        HStack {
+            TextField("", text: $taskName, prompt:
+                Text("What are you working on?")
+                    .foregroundStyle(FFTheme.Text.disabled)
+            )
+            .font(.subheadline)
+            .foregroundStyle(FFTheme.Text.secondary)
+            .multilineTextAlignment(.center)
+            .submitLabel(.done)
+            .padding(.vertical, 10)
+            .padding(.horizontal, 20)
+            .background(
+                RoundedRectangle(cornerRadius: FFTheme.Radius.sm)
+                    .fill(Color.white.opacity(0.04))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: FFTheme.Radius.sm)
+                            .stroke(FFTheme.Border.default, lineWidth: 0.5)
+                    )
+            )
+        }
+        .padding(.horizontal, 40)
+        .accessibilityLabel("Task name, optional")
+    }
+
+    // MARK: - Timer Controls
+
+    private var timerControls: some View {
+        Group {
+            switch engine.state {
+            case .idle:
+                startButton
+
+            case .running:
+                HStack(spacing: FFTheme.Spacing.md) {
+                    controlButton(
+                        label: "Pause",
+                        icon: "pause.fill",
+                        style: .secondary
+                    ) {
+                        engine.pause()
+                    }
+                    controlButton(
+                        label: "Cancel",
+                        icon: "xmark",
+                        style: .destructive
+                    ) {
+                        cancelSession()
+                    }
+                }
+                .padding(.horizontal, FFTheme.Spacing.xl)
+
+            case .paused:
+                HStack(spacing: FFTheme.Spacing.md) {
+                    controlButton(
+                        label: "Resume",
+                        icon: "play.fill",
+                        style: .primary
+                    ) {
+                        engine.resume()
+                    }
+                    controlButton(
+                        label: "Cancel",
+                        icon: "xmark",
+                        style: .destructive
+                    ) {
+                        cancelSession()
+                    }
+                }
+                .padding(.horizontal, FFTheme.Spacing.xl)
+
+            case .completed:
+                EmptyView()
+            }
+        }
+    }
+
+    private var startButton: some View {
+        let color = FFTheme.sessionColor(for: engine.currentSessionType)
+
+        return Button(action: startSession) {
+            Text("Start \(engine.currentSessionType.displayName)")
+                .font(.system(size: 15, weight: .medium))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(
+                    RoundedRectangle(cornerRadius: FFTheme.Radius.md)
+                        .fill(color)
+                )
+        }
+        .buttonStyle(.plain)
+        .padding(.horizontal, 40)
+        .accessibilityHint(
+            "Starts a \(engine.currentSessionType.displayName.lowercased()) session"
+        )
+    }
+
+    private enum ControlStyle { case primary, secondary, destructive }
+
+    private func controlButton(
+        label: String,
+        icon: String,
+        style: ControlStyle,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Label(label, systemImage: icon)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(foregroundColor(for: style))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: FFTheme.Radius.sm)
+                        .fill(backgroundColor(for: style))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: FFTheme.Radius.sm)
+                                .stroke(borderColor(for: style), lineWidth: 0.5)
+                        )
+                )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func foregroundColor(for style: ControlStyle) -> Color {
+        switch style {
+        case .primary: .white
+        case .secondary: FFTheme.Text.secondary
+        case .destructive: FFTheme.Accent.red.opacity(0.8)
+        }
+    }
+
+    private func backgroundColor(for style: ControlStyle) -> Color {
+        switch style {
+        case .primary:
+            FFTheme.sessionColor(for: engine.currentSessionType).opacity(0.15)
+        case .secondary:
+            Color.white.opacity(0.06)
+        case .destructive:
+            FFTheme.Accent.red.opacity(0.08)
+        }
+    }
+
+    private func borderColor(for style: ControlStyle) -> Color {
+        switch style {
+        case .primary:
+            FFTheme.sessionColor(for: engine.currentSessionType).opacity(0.3)
+        case .secondary:
+            FFTheme.Border.default
+        case .destructive:
+            FFTheme.Accent.red.opacity(0.2)
+        }
+    }
+
+    // MARK: - Preset Sync
+
     private var presetDurations: [Int] {
         guard let preset = presets.first else { return [] }
-        return [preset.focusDurationSeconds, preset.shortBreakDurationSeconds, preset.longBreakDurationSeconds]
+        return [
+            preset.focusDurationSeconds,
+            preset.shortBreakDurationSeconds,
+            preset.longBreakDurationSeconds,
+        ]
     }
 
     private func syncPresetToEngine() {
@@ -150,6 +334,8 @@ struct TimerView: View {
             longBreakSeconds: preset.longBreakDurationSeconds
         )
     }
+
+    // MARK: - Session Lifecycle
 
     private func startSession() {
         guard presets.first != nil else { return }
@@ -189,7 +375,9 @@ struct TimerView: View {
 
         engine.taskName = taskName
         engine.start(duration: duration, sessionType: engine.currentSessionType)
-        notificationService.scheduleCompletion(in: duration, sessionType: engine.currentSessionType)
+        notificationService.scheduleCompletion(
+            in: duration, sessionType: engine.currentSessionType
+        )
     }
 
     private func cancelSession() {
@@ -197,7 +385,9 @@ struct TimerView: View {
         if case .running(let date) = engine.state {
             startedAt = date
         } else if case .paused = engine.state {
-            startedAt = Date.now.addingTimeInterval(-(engine.totalDuration - engine.remainingSeconds))
+            startedAt = Date.now.addingTimeInterval(
+                -(engine.totalDuration - engine.remainingSeconds)
+            )
         } else {
             startedAt = nil
         }
@@ -282,7 +472,9 @@ struct TimerView: View {
         showCompletion = false
         guard engine.state == .completed else { return }
         if let preset = presets.first {
-            engine.prepareNextSession(sessionsBeforeLongBreak: preset.sessionsBeforeLongBreak)
+            engine.prepareNextSession(
+                sessionsBeforeLongBreak: preset.sessionsBeforeLongBreak
+            )
             engine.acknowledge()
             engine.loadPreset(
                 focusSeconds: preset.focusDurationSeconds,
@@ -327,5 +519,8 @@ struct TimerView: View {
     TimerView()
         .environment(TimerEngine())
         .environment(NotificationService())
-        .modelContainer(for: [TimerPreset.self, SessionLog.self, StreakState.self], inMemory: true)
+        .modelContainer(
+            for: [TimerPreset.self, SessionLog.self, StreakState.self],
+            inMemory: true
+        )
 }

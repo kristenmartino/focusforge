@@ -12,40 +12,85 @@ struct StatsView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                Picker("Period", selection: $selectedPeriod) {
-                    ForEach(StatsPeriod.allCases, id: \.self) {
-                        Text($0.rawValue).tag($0)
+            ZStack {
+                FFTheme.Background.primary.ignoresSafeArea()
+
+                VStack(spacing: 0) {
+                    // Dark segmented control
+                    darkSegmentedPicker
+                        .padding(.horizontal)
+                        .padding(.top, FFTheme.Spacing.xs)
+
+                    switch selectedPeriod {
+                    case .today:
+                        TodayStatsView()
+                    case .week:
+                        WeeklyStatsView()
+                    case .allTime:
+                        AllTimeStatsView()
                     }
                 }
-                .pickerStyle(.segmented)
-                .padding(.horizontal)
-                .padding(.top, 8)
-
-                switch selectedPeriod {
-                case .today:
-                    TodayStatsView()
-                case .week:
-                    WeeklyStatsView()
-                case .allTime:
-                    AllTimeStatsView()
-                }
             }
-            .navigationTitle("Stats")
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Text("Stats")
+                        .font(.headline)
+                        .foregroundStyle(FFTheme.Text.primary)
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink {
                         MilestoneTrackerView()
                     } label: {
                         Image(systemName: "trophy")
+                            .foregroundStyle(FFTheme.Text.secondary)
                     }
                 }
             }
+            .darkNavigationAppearance()
         }
+    }
+
+    private var darkSegmentedPicker: some View {
+        HStack(spacing: 2) {
+            ForEach(StatsPeriod.allCases, id: \.self) { period in
+                Button {
+                    selectedPeriod = period
+                } label: {
+                    Text(period.rawValue)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(
+                            selectedPeriod == period
+                                ? FFTheme.Text.primary
+                                : FFTheme.Text.tertiary
+                        )
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: FFTheme.Radius.sm)
+                                .fill(
+                                    selectedPeriod == period
+                                        ? Color.white.opacity(0.08)
+                                        : Color.clear
+                                )
+                        )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(2)
+        .background(
+            RoundedRectangle(cornerRadius: FFTheme.Radius.sm + 2)
+                .fill(Color.white.opacity(0.03))
+        )
     }
 }
 
 #Preview {
     StatsView()
-        .modelContainer(for: [SessionLog.self, StreakState.self, UnlockEvent.self], inMemory: true)
+        .modelContainer(
+            for: [SessionLog.self, StreakState.self, UnlockEvent.self],
+            inMemory: true
+        )
 }

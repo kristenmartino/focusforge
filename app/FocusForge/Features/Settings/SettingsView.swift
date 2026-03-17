@@ -13,127 +13,149 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                if let preset {
-                    Section("Timer") {
-                        Stepper(
-                            "Focus: \(preset.focusDurationSeconds / 60) min",
-                            value: focusBinding(preset),
-                            in: 1...120
-                        )
-                        Stepper(
-                            "Short break: \(preset.shortBreakDurationSeconds / 60) min",
-                            value: shortBreakBinding(preset),
-                            in: 1...30
-                        )
-                        Stepper(
-                            "Long break: \(preset.longBreakDurationSeconds / 60) min",
-                            value: longBreakBinding(preset),
-                            in: 1...30
-                        )
-                        Stepper(
-                            "Sessions before long break: \(preset.sessionsBeforeLongBreak)",
-                            value: sessionsBinding(preset),
-                            in: 1...10
-                        )
-                    }
-                }
+            ZStack {
+                FFTheme.Background.primary.ignoresSafeArea()
 
-                Section {
-                    HStack {
-                        Label("Streak Freezes", systemImage: "snowflake")
-                        Spacer()
-                        Text("\(streakState?.freezesAvailable ?? 0) available")
-                            .foregroundStyle(.secondary)
+                List {
+                    if let preset {
+                        Section("Timer") {
+                            Stepper(
+                                "Focus: \(preset.focusDurationSeconds / 60) min",
+                                value: focusBinding(preset),
+                                in: 1...120
+                            )
+                            Stepper(
+                                "Short break: \(preset.shortBreakDurationSeconds / 60) min",
+                                value: shortBreakBinding(preset),
+                                in: 1...30
+                            )
+                            Stepper(
+                                "Long break: \(preset.longBreakDurationSeconds / 60) min",
+                                value: longBreakBinding(preset),
+                                in: 1...30
+                            )
+                            Stepper(
+                                "Sessions before long break: \(preset.sessionsBeforeLongBreak)",
+                                value: sessionsBinding(preset),
+                                in: 1...10
+                            )
+                        }
+                        .listRowBackground(Color.white.opacity(0.04))
                     }
-                    if let state = streakState, state.freezesUsed > 0 {
+
+                    Section {
                         HStack {
-                            Text("Freezes used")
+                            Label("Streak Freezes", systemImage: "snowflake")
+                                .foregroundStyle(FFTheme.Accent.cyan)
                             Spacer()
-                            Text("\(state.freezesUsed)")
-                                .foregroundStyle(.secondary)
+                            Text("\(streakState?.freezesAvailable ?? 0) available")
+                                .foregroundStyle(FFTheme.Text.tertiary)
+                        }
+                        if let state = streakState, state.freezesUsed > 0 {
+                            HStack {
+                                Text("Freezes used")
+                                Spacer()
+                                Text("\(state.freezesUsed)")
+                                    .foregroundStyle(FFTheme.Text.tertiary)
+                            }
+                        }
+                    } header: {
+                        Text("Streak Freezes")
+                    } footer: {
+                        Text("Streak freezes are earned at milestone days (3, 7, 14, 30, 60). When you miss a day, a freeze is automatically used to protect your streak.")
+                    }
+                    .listRowBackground(Color.white.opacity(0.04))
+
+                    Section("AI Coach") {
+                        NavigationLink {
+                            AICoachSettingsView()
+                        } label: {
+                            Label("AI Coach Settings", systemImage: "brain.head.profile")
                         }
                     }
-                } header: {
-                    Text("Streak Freezes")
-                } footer: {
-                    Text("Streak freezes are earned at milestone days (3, 7, 14, 30, 60). When you miss a day, a freeze is automatically used to protect your streak.")
-                }
+                    .listRowBackground(Color.white.opacity(0.04))
 
-                Section("AI Coach") {
-                    NavigationLink {
-                        AICoachSettingsView()
-                    } label: {
-                        Label("AI Coach Settings", systemImage: "brain.head.profile")
-                    }
-                }
-
-                #if DEBUG
-                Section("Debug") {
-                    Button("Grant 500 Coins") {
-                        let state = StreakManager.fetchOrCreateStreakState(in: modelContext)
-                        state.totalCoins += 500
-                    }
-                    Button("Set Streak to Day 3 (Early Bird)") {
-                        let state = StreakManager.fetchOrCreateStreakState(in: modelContext)
-                        state.currentStreakDays = 3
-                        state.lastCompletedDate = .now
-                        if let reward = MilestoneEngine.checkMilestone(streakDays: 3, in: modelContext) {
-                            try? modelContext.save()
+                    #if DEBUG
+                    Section("Debug") {
+                        Button("Grant 500 Coins") {
+                            let state = StreakManager.fetchOrCreateStreakState(in: modelContext)
+                            state.totalCoins += 500
+                        }
+                        Button("Set Streak to Day 3 (Early Bird)") {
+                            let state = StreakManager.fetchOrCreateStreakState(in: modelContext)
+                            state.currentStreakDays = 3
+                            state.lastCompletedDate = .now
+                            if let _ = MilestoneEngine.checkMilestone(streakDays: 3, in: modelContext) {
+                                try? modelContext.save()
+                            }
+                        }
+                        Button("Set Streak to Day 7 (Week Warrior)") {
+                            let state = StreakManager.fetchOrCreateStreakState(in: modelContext)
+                            state.currentStreakDays = 7
+                            state.lastCompletedDate = .now
+                            if let _ = MilestoneEngine.checkMilestone(streakDays: 7, in: modelContext) {
+                                try? modelContext.save()
+                            }
+                        }
+                        HStack {
+                            Text("Coins")
+                            Spacer()
+                            Text("\(streakState?.totalCoins ?? 0)")
+                                .foregroundStyle(FFTheme.Text.tertiary)
+                        }
+                        HStack {
+                            Text("Streak")
+                            Spacer()
+                            Text("Day \(streakState?.currentStreakDays ?? 0)")
+                                .foregroundStyle(FFTheme.Text.tertiary)
+                        }
+                        Button("Trigger Streak Risk (Yesterday Evening)") {
+                            let state = StreakManager.fetchOrCreateStreakState(in: modelContext)
+                            let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: .now)!
+                            let yesterdayEvening = Calendar.current.date(bySettingHour: 21, minute: 0, second: 0, of: yesterday)!
+                            state.lastCompletedDate = yesterdayEvening
+                            if state.currentStreakDays == 0 { state.currentStreakDays = 3 }
+                        }
+                        Button("Show Behavior Signal") {
+                            let signal = BehaviorSignalComputer.compute(in: modelContext)
+                            debugSignalText = String(format: "Completion: %.0f%% | Abandon: %.0f%% | Avg: %.0fmin | Risk: %.2f | Sessions: %d",
+                                signal.completionRate7d * 100,
+                                signal.abandonRate7d * 100,
+                                signal.avgActualFocusMinutes,
+                                signal.streakRiskScore,
+                                signal.totalSessions7d
+                            )
+                        }
+                        if !debugSignalText.isEmpty {
+                            Text(debugSignalText)
+                                .font(.caption2)
+                                .foregroundStyle(FFTheme.Text.tertiary)
                         }
                     }
-                    Button("Set Streak to Day 7 (Week Warrior)") {
-                        let state = StreakManager.fetchOrCreateStreakState(in: modelContext)
-                        state.currentStreakDays = 7
-                        state.lastCompletedDate = .now
-                        if let reward = MilestoneEngine.checkMilestone(streakDays: 7, in: modelContext) {
-                            try? modelContext.save()
-                        }
-                    }
-                    HStack {
-                        Text("Coins")
-                        Spacer()
-                        Text("\(streakState?.totalCoins ?? 0)")
-                            .foregroundStyle(.secondary)
-                    }
-                    HStack {
-                        Text("Streak")
-                        Spacer()
-                        Text("Day \(streakState?.currentStreakDays ?? 0)")
-                            .foregroundStyle(.secondary)
-                    }
-                    Button("Trigger Streak Risk (Yesterday Evening)") {
-                        let state = StreakManager.fetchOrCreateStreakState(in: modelContext)
-                        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: .now)!
-                        let yesterdayEvening = Calendar.current.date(bySettingHour: 21, minute: 0, second: 0, of: yesterday)!
-                        state.lastCompletedDate = yesterdayEvening
-                        if state.currentStreakDays == 0 { state.currentStreakDays = 3 }
-                    }
-                    Button("Show Behavior Signal") {
-                        let signal = BehaviorSignalComputer.compute(in: modelContext)
-                        debugSignalText = String(format: "Completion: %.0f%% | Abandon: %.0f%% | Avg: %.0fmin | Risk: %.2f | Sessions: %d",
-                            signal.completionRate7d * 100,
-                            signal.abandonRate7d * 100,
-                            signal.avgActualFocusMinutes,
-                            signal.streakRiskScore,
-                            signal.totalSessions7d
-                        )
-                    }
-                    if !debugSignalText.isEmpty {
-                        Text(debugSignalText)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                #endif
+                    .listRowBackground(Color.white.opacity(0.04))
+                    #endif
 
-                Section("About") {
-                    LabeledContent("Version", value: "0.4.0")
+                    Section("About") {
+                        LabeledContent("Version", value: "0.5.0")
+                    }
+                    .listRowBackground(Color.white.opacity(0.04))
+                }
+                .scrollContentBackground(.hidden)
+            }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Text("Settings")
+                        .font(.headline)
+                        .foregroundStyle(FFTheme.Text.primary)
                 }
             }
-            .navigationTitle("Settings")
+            .darkNavigationAppearance()
         }
     }
+
+    // MARK: - Bindings
 
     private func focusBinding(_ preset: TimerPreset) -> Binding<Int> {
         Binding(

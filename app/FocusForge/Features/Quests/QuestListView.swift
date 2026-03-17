@@ -20,37 +20,59 @@ struct QuestListView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
-                if activeQuests.isEmpty {
-                    ContentUnavailableView(
-                        "No Active Quests",
-                        systemImage: "scroll",
-                        description: Text("New quests appear daily at midnight.")
-                    )
-                } else {
-                    List {
-                        if !dailyQuests.isEmpty {
-                            Section("Daily Quests") {
-                                ForEach(dailyQuests, id: \.questID) { quest in
-                                    QuestRowView(quest: quest) {
-                                        QuestManager.claimReward(questID: quest.questID, in: modelContext)
+            ZStack {
+                FFTheme.Background.primary.ignoresSafeArea()
+
+                Group {
+                    if activeQuests.isEmpty {
+                        ContentUnavailableView(
+                            "No Active Quests",
+                            systemImage: "scroll",
+                            description: Text("New quests appear daily at midnight.")
+                        )
+                    } else {
+                        List {
+                            if !dailyQuests.isEmpty {
+                                Section("Daily Quests") {
+                                    ForEach(dailyQuests, id: \.questID) { quest in
+                                        QuestRowView(quest: quest) {
+                                            QuestManager.claimReward(
+                                                questID: quest.questID,
+                                                in: modelContext
+                                            )
+                                        }
                                     }
+                                    .listRowBackground(Color.white.opacity(0.04))
+                                }
+                            }
+                            if !weeklyQuests.isEmpty {
+                                Section("Weekly Quests") {
+                                    ForEach(weeklyQuests, id: \.questID) { quest in
+                                        QuestRowView(quest: quest) {
+                                            QuestManager.claimReward(
+                                                questID: quest.questID,
+                                                in: modelContext
+                                            )
+                                        }
+                                    }
+                                    .listRowBackground(Color.white.opacity(0.04))
                                 }
                             }
                         }
-                        if !weeklyQuests.isEmpty {
-                            Section("Weekly Quests") {
-                                ForEach(weeklyQuests, id: \.questID) { quest in
-                                    QuestRowView(quest: quest) {
-                                        QuestManager.claimReward(questID: quest.questID, in: modelContext)
-                                    }
-                                }
-                            }
-                        }
+                        .scrollContentBackground(.hidden)
                     }
                 }
             }
-            .navigationTitle("Quests")
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Text("Quests")
+                        .font(.headline)
+                        .foregroundStyle(FFTheme.Text.primary)
+                }
+            }
+            .darkNavigationAppearance()
         }
     }
 }

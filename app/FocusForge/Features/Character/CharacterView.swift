@@ -7,18 +7,31 @@ struct CharacterView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
-                if let loadout = loadouts.first {
-                    DressingRoomView(loadout: loadout)
-                } else {
-                    ContentUnavailableView(
-                        "No Character",
-                        systemImage: "person.crop.circle.badge.questionmark",
-                        description: Text("Complete onboarding to create your character.")
-                    )
+            ZStack {
+                FFTheme.Background.primary.ignoresSafeArea()
+
+                Group {
+                    if let loadout = loadouts.first {
+                        DressingRoomView(loadout: loadout)
+                    } else {
+                        ContentUnavailableView(
+                            "No Character",
+                            systemImage: "person.crop.circle.badge.questionmark",
+                            description: Text("Complete onboarding to create your character.")
+                        )
+                    }
                 }
             }
-            .navigationTitle("Character")
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Text("Character")
+                        .font(.headline)
+                        .foregroundStyle(FFTheme.Text.primary)
+                }
+            }
+            .darkNavigationAppearance()
         }
     }
 }
