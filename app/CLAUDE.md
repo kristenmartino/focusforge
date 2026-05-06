@@ -56,6 +56,12 @@ All colors live in `Theme/FFTheme.swift`. Never use raw `Color.blue` etc — use
 
 Replaces the old `ProgressRingView`. Three layers: subtle track, wide glow aura (15% opacity), thin crisp ring (90% opacity).
 
+## Reward Overlay (`RewardOverlayView`)
+
+Replaces the old sheet-based `SessionCompletionView`. Full-screen in-place overlay with 5-beat cinematic animation:
+1. Ring pulse (t=0) → 2. Background crossfade (t=400ms) → 3. Checkmark + headline (t=800ms) → 4. Reward card + count-up (t=1200ms) → 5. CTA button (t=1600ms).
+Tap to skip. Respects `accessibilityReduceMotion`. Uses `CountUpText` for animated number counting and `RingPulseView` for the initial pulse.
+
 ## Dark Mode Strategy
 
 - App forces `.preferredColorScheme(.dark)` on ContentView
@@ -75,7 +81,9 @@ FocusForge/
       TimerView.swift          — Focus mode (dark canvas + glow ring)
       Components/
         GlowProgressRingView.swift
-        SessionCompletionView.swift  — Reward mode (cinematic reveal)
+        RewardOverlayView.swift      — Full-screen cinematic reward overlay
+        RingPulseView.swift          — Ring completion pulse animation
+        CountUpText.swift            — Animated number counter
         MilestoneUnlockView.swift    — Reward mode
         StreakBadgeView.swift
         IntentFramingView.swift      — AI Coach pre-session

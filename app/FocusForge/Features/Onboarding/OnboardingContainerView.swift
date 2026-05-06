@@ -9,21 +9,26 @@ struct OnboardingContainerView: View {
     @State private var selectedCharacterID = "spark"
 
     var body: some View {
-        TabView(selection: $currentStep) {
-            WelcomeStepView(onContinue: { currentStep = 1 })
-                .tag(0)
-            CharacterSelectionStepView(
-                selectedID: $selectedCharacterID,
-                onContinue: { currentStep = 2 }
-            )
-            .tag(1)
-            NotificationPermissionStepView(onContinue: { currentStep = 3 })
-                .tag(2)
-            FirstSessionNudgeView(onComplete: completeOnboarding)
-                .tag(3)
+        ZStack {
+            FFTheme.Background.primary.ignoresSafeArea()
+
+            TabView(selection: $currentStep) {
+                WelcomeStepView(onContinue: { withAnimation { currentStep = 1 } })
+                    .tag(0)
+                CharacterSelectionStepView(
+                    selectedID: $selectedCharacterID,
+                    onContinue: { withAnimation { currentStep = 2 } }
+                )
+                .tag(1)
+                NotificationPermissionStepView(onContinue: { withAnimation { currentStep = 3 } })
+                    .tag(2)
+                FirstSessionNudgeView(onComplete: completeOnboarding)
+                    .tag(3)
+            }
+            .tabViewStyle(.page(indexDisplayMode: .always))
+            .indexViewStyle(.page(backgroundDisplayMode: .always))
         }
-        .tabViewStyle(.page(indexDisplayMode: .always))
-        .indexViewStyle(.page(backgroundDisplayMode: .always))
+        .preferredColorScheme(.dark)
     }
 
     private func completeOnboarding() {
@@ -34,7 +39,6 @@ struct OnboardingContainerView: View {
         )
         modelContext.insert(profile)
 
-        // Create character loadout from selected preset
         if let preset = CharacterCatalog.presets.first(where: { $0.id == selectedCharacterID }) {
             let loadout = CharacterCatalog.createLoadout(from: preset)
             modelContext.insert(loadout)

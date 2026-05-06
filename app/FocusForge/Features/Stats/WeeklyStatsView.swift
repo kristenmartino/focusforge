@@ -35,36 +35,61 @@ struct WeeklyStatsView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: FFTheme.Spacing.lg) {
                 Chart(last7Days) { day in
                     BarMark(
                         x: .value("Day", day.dayLabel),
                         y: .value("Minutes", day.minutes)
                     )
-                    .foregroundStyle(.blue.gradient)
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [
+                                FFTheme.Accent.blue,
+                                FFTheme.Accent.blue.opacity(0.6),
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
                     .cornerRadius(4)
                 }
                 .chartYAxisLabel("Minutes")
+                .chartXAxis {
+                    AxisMarks { _ in
+                        AxisValueLabel()
+                            .foregroundStyle(FFTheme.Text.tertiary)
+                    }
+                }
+                .chartYAxis {
+                    AxisMarks { _ in
+                        AxisGridLine()
+                            .foregroundStyle(FFTheme.Border.default)
+                        AxisValueLabel()
+                            .foregroundStyle(FFTheme.Text.tertiary)
+                    }
+                }
                 .frame(height: 220)
                 .padding()
 
                 let totalMinutes = last7Days.reduce(0) { $0 + $1.minutes }
                 let avgMinutes = last7Days.isEmpty ? 0 : totalMinutes / last7Days.count
 
-                HStack(spacing: 32) {
-                    VStack {
+                HStack(spacing: FFTheme.Spacing.xxxl) {
+                    VStack(spacing: 4) {
                         Text("\(totalMinutes)")
-                            .font(.title2.bold())
+                            .font(.statNumber)
+                            .foregroundStyle(FFTheme.Text.primary)
                         Text("Total min")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(.statLabel)
+                            .foregroundStyle(FFTheme.Text.tertiary)
                     }
-                    VStack {
+                    VStack(spacing: 4) {
                         Text("\(avgMinutes)")
-                            .font(.title2.bold())
+                            .font(.statNumber)
+                            .foregroundStyle(FFTheme.Text.primary)
                         Text("Daily avg")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(.statLabel)
+                            .foregroundStyle(FFTheme.Text.tertiary)
                     }
                 }
             }

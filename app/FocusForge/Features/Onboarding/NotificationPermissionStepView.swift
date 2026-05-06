@@ -4,53 +4,66 @@ struct NotificationPermissionStepView: View {
     @Environment(NotificationService.self) private var notificationService
     let onContinue: () -> Void
 
-    @State private var hasResponded = false
-
     var body: some View {
-        VStack(spacing: 24) {
-            Spacer()
+        ZStack {
+            FFTheme.Background.primary.ignoresSafeArea()
 
-            Image(systemName: "bell.badge.fill")
-                .font(.system(size: 60))
-                .foregroundStyle(.blue)
-                .accessibilityHidden(true)
+            RadialGradient(
+                colors: [
+                    FFTheme.Accent.blue.opacity(0.06),
+                    Color.clear,
+                ],
+                center: UnitPoint(x: 0.5, y: 0.35),
+                startRadius: 0,
+                endRadius: 160
+            )
+            .ignoresSafeArea()
 
-            Text("Stay on Track")
-                .font(.title2.bold())
+            VStack(spacing: FFTheme.Spacing.xl) {
+                Spacer()
 
-            Text("Get notified when your timer completes, even if the app is in the background.")
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
+                Image(systemName: "bell.badge.fill")
+                    .font(.system(size: 60))
+                    .foregroundStyle(FFTheme.Accent.blue)
+                    .accessibilityHidden(true)
 
-            Spacer()
+                VStack(spacing: FFTheme.Spacing.xs) {
+                    Text("Stay on Track")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(FFTheme.Text.primary)
 
-            VStack(spacing: 12) {
-                Button(action: requestPermission) {
-                    Text("Enable Notifications")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding()
+                    Text("Get notified when your timer completes,\neven if the app is in the background.")
+                        .font(.body)
+                        .foregroundStyle(FFTheme.Text.secondary)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(4)
                 }
-                .buttonStyle(.borderedProminent)
-                .padding(.horizontal, 40)
 
-                Button(action: onContinue) {
-                    Text("Not Now")
-                        .font(.subheadline)
+                Spacer()
+
+                VStack(spacing: FFTheme.Spacing.sm) {
+                    AccentPillButton(
+                        title: "Enable Notifications",
+                        action: {
+                            Task {
+                                _ = await notificationService.requestPermission()
+                                onContinue()
+                            }
+                        },
+                        style: .blue
+                    )
+                    .padding(.horizontal, 40)
+
+                    Button(action: onContinue) {
+                        Text("Not Now")
+                            .font(.subheadline)
+                            .foregroundStyle(FFTheme.Text.tertiary)
+                    }
                 }
-                .foregroundStyle(.secondary)
+
+                Spacer()
+                    .frame(height: FFTheme.Spacing.xxxl)
             }
-
-            Spacer()
-        }
-    }
-
-    private func requestPermission() {
-        Task {
-            _ = await notificationService.requestPermission()
-            onContinue()
         }
     }
 }

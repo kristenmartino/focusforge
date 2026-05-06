@@ -4,35 +4,49 @@ struct WelcomeStepView: View {
     let onContinue: () -> Void
 
     var body: some View {
-        VStack(spacing: 24) {
-            Spacer()
+        ZStack {
+            FFTheme.Background.primary.ignoresSafeArea()
 
-            Image(systemName: "flame.fill")
-                .font(.system(size: 80))
-                .foregroundStyle(.orange)
-                .accessibilityHidden(true)
+            // Warm ambient glow behind the icon
+            RadialGradient(
+                colors: [
+                    FFTheme.Accent.orange.opacity(0.10),
+                    Color.clear,
+                ],
+                center: UnitPoint(x: 0.5, y: 0.35),
+                startRadius: 0,
+                endRadius: 160
+            )
+            .ignoresSafeArea()
 
-            Text("FocusForge")
-                .font(.largeTitle.bold())
+            VStack(spacing: FFTheme.Spacing.xl) {
+                Spacer()
 
-            Text("Build focus habits with timers, streaks, and character progression.")
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
+                Image(systemName: "flame.fill")
+                    .font(.system(size: 72))
+                    .foregroundStyle(FFTheme.Accent.orange)
+                    .accessibilityHidden(true)
 
-            Spacer()
+                VStack(spacing: FFTheme.Spacing.xs) {
+                    Text("FocusForge")
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundStyle(FFTheme.Text.primary)
 
-            Button(action: onContinue) {
-                Text("Get Started")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding()
+                    Text("Build focus habits with timers, streaks,\nand character progression.")
+                        .font(.body)
+                        .foregroundStyle(FFTheme.Text.secondary)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(4)
+                }
+
+                Spacer()
+
+                AccentPillButton(title: "Get Started", action: onContinue, style: .blue)
+                    .padding(.horizontal, 40)
+
+                Spacer()
+                    .frame(height: FFTheme.Spacing.xxxl)
             }
-            .buttonStyle(.borderedProminent)
-            .padding(.horizontal, 40)
-
-            Spacer()
         }
     }
 }

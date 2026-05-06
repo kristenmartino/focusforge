@@ -15,42 +15,42 @@ struct AllTimeStatsView: View {
 
     var body: some View {
         ScrollView {
-            LazyVGrid(columns: columns, spacing: 16) {
+            LazyVGrid(columns: columns, spacing: FFTheme.Spacing.sm) {
                 StatCardView(
                     title: "Total Sessions",
                     value: "\(completedFocus.count)",
                     icon: "checkmark.circle.fill",
-                    color: .green
+                    color: FFTheme.Accent.green
                 )
                 StatCardView(
                     title: "Total Minutes",
                     value: "\(completedFocus.reduce(0) { $0 + $1.actualDurationSeconds } / 60)",
                     icon: "clock.fill",
-                    color: .blue
+                    color: FFTheme.Accent.blue
                 )
                 StatCardView(
                     title: "Longest Streak",
                     value: "\(streak?.longestStreakDays ?? 0) days",
                     icon: "flame.fill",
-                    color: .orange
+                    color: FFTheme.Accent.orange
                 )
                 StatCardView(
                     title: "Level",
                     value: "\(streak?.currentLevel ?? 1)",
                     icon: "arrow.up.circle.fill",
-                    color: .cyan
+                    color: FFTheme.Accent.cyan
                 )
                 StatCardView(
                     title: "Total XP",
                     value: "\(streak?.totalXP ?? 0)",
                     icon: "star.fill",
-                    color: .yellow
+                    color: FFTheme.Accent.gold
                 )
                 StatCardView(
                     title: "Total Coins",
                     value: "\(streak?.totalCoins ?? 0)",
                     icon: "circle.fill",
-                    color: .orange
+                    color: FFTheme.Accent.orange
                 )
             }
             .padding()

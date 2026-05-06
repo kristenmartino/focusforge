@@ -7,57 +7,86 @@ struct CharacterSelectionStepView: View {
     private let presets = CharacterCatalog.presets
 
     var body: some View {
-        VStack(spacing: 24) {
-            Spacer()
+        ZStack {
+            FFTheme.Background.primary.ignoresSafeArea()
 
-            Text("Choose Your Character")
-                .font(.title2.bold())
+            // Subtle glow behind characters
+            RadialGradient(
+                colors: [
+                    FFTheme.Accent.purple.opacity(0.06),
+                    Color.clear,
+                ],
+                center: UnitPoint(x: 0.5, y: 0.42),
+                startRadius: 0,
+                endRadius: 180
+            )
+            .ignoresSafeArea()
 
-            Text("You can customize them later.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            VStack(spacing: FFTheme.Spacing.xl) {
+                Spacer()
 
-            HStack(spacing: 16) {
-                ForEach(presets) { preset in
-                    Button {
-                        selectedID = preset.id
-                    } label: {
-                        VStack(spacing: 8) {
-                            CharacterSpriteView(
-                                loadout: CharacterCatalog.createLoadout(from: preset),
-                                size: 90
-                            )
-                            .frame(width: 100, height: 100)
-                            .background(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .fill(selectedID == preset.id ? Color.accentColor.opacity(0.15) : Color.secondary.opacity(0.1))
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(selectedID == preset.id ? Color.accentColor : Color.clear, lineWidth: 2)
-                            )
-                            Text(preset.name)
-                                .font(.caption)
-                        }
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("\(preset.name) character")
-                    .accessibilityAddTraits(selectedID == preset.id ? .isSelected : [])
+                VStack(spacing: FFTheme.Spacing.xs) {
+                    Text("Choose Your Character")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(FFTheme.Text.primary)
+
+                    Text("You can customize them later.")
+                        .font(.subheadline)
+                        .foregroundStyle(FFTheme.Text.tertiary)
                 }
+
+                HStack(spacing: FFTheme.Spacing.md) {
+                    ForEach(presets) { preset in
+                        Button {
+                            selectedID = preset.id
+                        } label: {
+                            VStack(spacing: FFTheme.Spacing.xs) {
+                                CharacterSpriteView(
+                                    loadout: CharacterCatalog.createLoadout(from: preset),
+                                    size: 80
+                                )
+                                .frame(width: 90, height: 90)
+                                .background(
+                                    RoundedRectangle(cornerRadius: FFTheme.Radius.lg)
+                                        .fill(
+                                            selectedID == preset.id
+                                                ? FFTheme.Accent.blue.opacity(0.10)
+                                                : Color.white.opacity(0.04)
+                                        )
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: FFTheme.Radius.lg)
+                                        .stroke(
+                                            selectedID == preset.id
+                                                ? FFTheme.Accent.blue.opacity(0.5)
+                                                : FFTheme.Border.default,
+                                            lineWidth: selectedID == preset.id ? 1.5 : 0.5
+                                        )
+                                )
+
+                                Text(preset.name)
+                                    .font(.caption)
+                                    .foregroundStyle(
+                                        selectedID == preset.id
+                                            ? FFTheme.Text.primary
+                                            : FFTheme.Text.tertiary
+                                    )
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("\(preset.name) character")
+                        .accessibilityAddTraits(selectedID == preset.id ? .isSelected : [])
+                    }
+                }
+
+                Spacer()
+
+                AccentPillButton(title: "Continue", action: onContinue, style: .blue)
+                    .padding(.horizontal, 40)
+
+                Spacer()
+                    .frame(height: FFTheme.Spacing.xxxl)
             }
-
-            Spacer()
-
-            Button(action: onContinue) {
-                Text("Continue")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-            }
-            .buttonStyle(.borderedProminent)
-            .padding(.horizontal, 40)
-
-            Spacer()
         }
         .onAppear {
             if selectedID.isEmpty || !presets.contains(where: { $0.id == selectedID }) {

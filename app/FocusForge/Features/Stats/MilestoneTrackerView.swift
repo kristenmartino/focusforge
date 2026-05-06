@@ -12,16 +12,23 @@ struct MilestoneTrackerView: View {
     }
 
     var body: some View {
-        List {
-            ForEach(MilestoneEngine.milestones, id: \.milestoneID) { milestone in
-                MilestoneRowView(
-                    milestone: milestone,
-                    currentStreak: currentStreak,
-                    isEarned: isEarned(milestone)
-                )
+        ZStack {
+            FFTheme.Background.primary.ignoresSafeArea()
+
+            List {
+                ForEach(MilestoneEngine.milestones, id: \.milestoneID) { milestone in
+                    MilestoneRowView(
+                        milestone: milestone,
+                        currentStreak: currentStreak,
+                        isEarned: isEarned(milestone)
+                    )
+                    .listRowBackground(Color.white.opacity(0.04))
+                }
             }
+            .scrollContentBackground(.hidden)
         }
         .navigationTitle("Milestones")
+        .darkNavigationAppearance()
     }
 }
 
@@ -31,26 +38,28 @@ struct MilestoneRowView: View {
     let isEarned: Bool
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: FFTheme.Spacing.sm) {
+            // Trophy icon
             Image(systemName: isEarned ? "trophy.fill" : "trophy")
                 .font(.title2)
-                .foregroundStyle(isEarned ? rarityColor : .gray)
+                .foregroundStyle(isEarned ? rarityColor : FFTheme.Text.tertiary)
                 .frame(width: 36)
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
                     Text(milestone.name)
-                        .font(.body.bold())
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(FFTheme.Text.primary)
                     if isEarned {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.caption)
-                            .foregroundStyle(.green)
+                            .foregroundStyle(FFTheme.Accent.green)
                     }
                 }
 
                 Text("\(milestone.streakDay)-day streak")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(FFTheme.Text.tertiary)
 
                 if !isEarned {
                     ProgressView(
@@ -60,18 +69,23 @@ struct MilestoneRowView: View {
                     .tint(rarityColor)
                 }
 
-                HStack(spacing: 8) {
+                HStack(spacing: FFTheme.Spacing.xs) {
                     HStack(spacing: 2) {
                         Image(systemName: slotIcon)
+                            .font(.system(size: 10))
                         Text(milestone.itemName)
+                            .font(.caption)
                     }
-                    .font(.caption)
+                    .foregroundStyle(FFTheme.Text.secondary)
 
                     Text(milestone.itemRarity.rawValue.capitalized)
                         .font(.system(size: 10, weight: .semibold))
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
-                        .background(rarityColor.opacity(0.2), in: Capsule())
+                        .background(
+                            Capsule()
+                                .fill(rarityColor.opacity(0.12))
+                        )
                         .foregroundStyle(rarityColor)
                 }
             }
@@ -82,9 +96,9 @@ struct MilestoneRowView: View {
 
     private var rarityColor: Color {
         switch milestone.itemRarity {
-        case .common: .gray
-        case .rare: .purple
-        case .animatedRare: .orange
+        case .common: FFTheme.Rarity.common
+        case .rare: FFTheme.Rarity.rare
+        case .animatedRare: FFTheme.Rarity.animatedRare
         }
     }
 
