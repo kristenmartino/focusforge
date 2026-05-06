@@ -234,8 +234,8 @@ struct AccentPillButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 15, weight: .medium))
-                .foregroundStyle(.white)
+                .font(.body.weight(.medium))
+                .foregroundStyle(FFTheme.Text.primary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
                 .background(

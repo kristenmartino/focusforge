@@ -6,6 +6,7 @@ struct DressingRoomView: View {
 
     @State private var selectedSlot: ItemSlot = .horns
     @State private var toastMessage: String?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var bodyColor: Color { Color(hex: loadout.bodyColorHex) }
 
@@ -69,7 +70,7 @@ struct DressingRoomView: View {
                         }
                     )
                     .padding(.horizontal)
-                    .animation(.default, value: selectedSlot)
+                    .animation(reduceMotion ? .none : .default, value: selectedSlot)
                 }
                 .padding(.bottom, FFTheme.Spacing.lg)
             }
@@ -77,8 +78,8 @@ struct DressingRoomView: View {
         .overlay(alignment: .bottom) {
             if let message = toastMessage {
                 Text(message)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.white)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(FFTheme.Text.primary)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
                     .background(
@@ -89,11 +90,12 @@ struct DressingRoomView: View {
                                     .stroke(Color.white.opacity(0.08), lineWidth: 0.5)
                             )
                     )
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .transition(reduceMotion ? .opacity : .move(edge: .bottom).combined(with: .opacity))
                     .padding(.bottom, 16)
+                    .accessibilityAddTraits(.isStaticText)
             }
         }
-        .animation(.easeInOut(duration: 0.25), value: toastMessage)
+        .animation(reduceMotion ? .none : .easeInOut(duration: 0.25), value: toastMessage)
     }
 
     // MARK: - Dark Color Picker
@@ -105,9 +107,10 @@ struct DressingRoomView: View {
     ) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(label.uppercased())
-                .font(.system(size: 10, weight: .medium))
+                .font(.caption2.weight(.medium))
                 .foregroundStyle(FFTheme.Text.tertiary)
                 .tracking(1)
+                .accessibilityAddTraits(.isHeader)
 
             HStack(spacing: 10) {
                 ForEach(colors, id: \.hex) { color in
@@ -132,6 +135,8 @@ struct DressingRoomView: View {
                                     .padding(1)
                                     .opacity(selectedHex.wrappedValue == color.hex ? 1 : 0)
                             )
+                            .frame(minWidth: 44, minHeight: 44)
+                            .contentShape(Circle())
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(
@@ -157,7 +162,7 @@ struct DressingRoomView: View {
                     selectedSlot = slot
                 } label: {
                     Text(label)
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.caption.weight(.medium))
                         .foregroundStyle(
                             selectedSlot == slot
                                 ? FFTheme.Text.primary
@@ -165,6 +170,7 @@ struct DressingRoomView: View {
                         )
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
+                        .frame(minHeight: 44)
                         .background(
                             RoundedRectangle(cornerRadius: FFTheme.Radius.sm)
                                 .fill(
@@ -175,6 +181,8 @@ struct DressingRoomView: View {
                         )
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("\(label) slot")
+                .accessibilityAddTraits(selectedSlot == slot ? .isSelected : [])
             }
         }
         .padding(2)

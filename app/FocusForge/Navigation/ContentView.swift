@@ -7,6 +7,7 @@ struct ContentView: View {
     @Query private var coachPreferences: [AICoachPreference]
     @Query private var streakStates: [StreakState]
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var selectedTab = 0
     @State private var showRescueBanner = false
@@ -71,11 +72,11 @@ struct ContentView: View {
                         bannerDismissed = true
                     }
                 )
-                .transition(.move(edge: .top).combined(with: .opacity))
+                .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
                 .padding(.top, 4)
             }
         }
-        .animation(.easeInOut(duration: 0.3), value: shouldShowBanner)
+        .animation(reduceMotion ? .none : .easeInOut(duration: 0.3), value: shouldShowBanner)
         .preferredColorScheme(.dark)
     }
 }

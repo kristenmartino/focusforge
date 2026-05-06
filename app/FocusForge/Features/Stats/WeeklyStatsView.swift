@@ -34,7 +34,10 @@ struct WeeklyStatsView: View {
     }
 
     var body: some View {
-        ScrollView {
+        let totalMinutes = last7Days.reduce(0) { $0 + $1.minutes }
+        let avgMinutes = last7Days.isEmpty ? 0 : totalMinutes / last7Days.count
+
+        return ScrollView {
             VStack(spacing: FFTheme.Spacing.lg) {
                 Chart(last7Days) { day in
                     BarMark(
@@ -52,6 +55,8 @@ struct WeeklyStatsView: View {
                         )
                     )
                     .cornerRadius(4)
+                    .accessibilityLabel(day.dayLabel)
+                    .accessibilityValue("\(day.minutes) minutes")
                 }
                 .chartYAxisLabel("Minutes")
                 .chartXAxis {
@@ -70,9 +75,10 @@ struct WeeklyStatsView: View {
                 }
                 .frame(height: 220)
                 .padding()
-
-                let totalMinutes = last7Days.reduce(0) { $0 + $1.minutes }
-                let avgMinutes = last7Days.isEmpty ? 0 : totalMinutes / last7Days.count
+                .accessibilityLabel("Last 7 days of focus minutes")
+                .accessibilityValue(
+                    "Total \(totalMinutes) minutes, daily average \(avgMinutes) minutes"
+                )
 
                 HStack(spacing: FFTheme.Spacing.xxxl) {
                     VStack(spacing: 4) {
@@ -83,6 +89,8 @@ struct WeeklyStatsView: View {
                             .font(.statLabel)
                             .foregroundStyle(FFTheme.Text.tertiary)
                     }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Total: \(totalMinutes) minutes this week")
                     VStack(spacing: 4) {
                         Text("\(avgMinutes)")
                             .font(.statNumber)
@@ -91,6 +99,8 @@ struct WeeklyStatsView: View {
                             .font(.statLabel)
                             .foregroundStyle(FFTheme.Text.tertiary)
                     }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Daily average: \(avgMinutes) minutes")
                 }
             }
         }

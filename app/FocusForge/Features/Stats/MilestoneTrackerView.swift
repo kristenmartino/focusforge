@@ -48,12 +48,13 @@ struct MilestoneRowView: View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
                     Text(milestone.name)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.body.weight(.semibold))
                         .foregroundStyle(FFTheme.Text.primary)
                     if isEarned {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.caption)
                             .foregroundStyle(FFTheme.Accent.green)
+                            .accessibilityLabel("Earned")
                     }
                 }
 
@@ -72,14 +73,15 @@ struct MilestoneRowView: View {
                 HStack(spacing: FFTheme.Spacing.xs) {
                     HStack(spacing: 2) {
                         Image(systemName: slotIcon)
-                            .font(.system(size: 10))
+                            .font(.caption2)
+                            .accessibilityHidden(true)
                         Text(milestone.itemName)
                             .font(.caption)
                     }
                     .foregroundStyle(FFTheme.Text.secondary)
 
                     Text(milestone.itemRarity.rawValue.capitalized)
-                        .font(.system(size: 10, weight: .semibold))
+                        .font(.caption2.weight(.semibold))
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
                         .background(

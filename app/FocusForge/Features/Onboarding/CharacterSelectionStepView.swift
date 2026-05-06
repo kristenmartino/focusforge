@@ -27,7 +27,7 @@ struct CharacterSelectionStepView: View {
 
                 VStack(spacing: FFTheme.Spacing.xs) {
                     Text("Choose Your Character")
-                        .font(.system(size: 22, weight: .bold))
+                        .font(.title2.bold())
                         .foregroundStyle(FFTheme.Text.primary)
 
                     Text("You can customize them later.")

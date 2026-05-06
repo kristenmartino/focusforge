@@ -46,6 +46,8 @@ struct StatsView: View {
                         Image(systemName: "trophy")
                             .foregroundStyle(FFTheme.Text.secondary)
                     }
+                    .accessibilityLabel("Milestones")
+                    .accessibilityHint("Shows your streak milestone progress and rewards")
                 }
             }
             .darkNavigationAppearance()
@@ -59,7 +61,7 @@ struct StatsView: View {
                     selectedPeriod = period
                 } label: {
                     Text(period.rawValue)
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.caption.weight(.medium))
                         .foregroundStyle(
                             selectedPeriod == period
                                 ? FFTheme.Text.primary
@@ -67,6 +69,7 @@ struct StatsView: View {
                         )
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
+                        .frame(minHeight: 44)
                         .background(
                             RoundedRectangle(cornerRadius: FFTheme.Radius.sm)
                                 .fill(
@@ -77,6 +80,8 @@ struct StatsView: View {
                         )
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("\(period.rawValue) stats")
+                .accessibilityAddTraits(selectedPeriod == period ? .isSelected : [])
             }
         }
         .padding(2)

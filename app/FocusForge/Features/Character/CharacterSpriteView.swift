@@ -49,6 +49,18 @@ struct CharacterSpriteView: View {
             }
         }
         .frame(width: size, height: size)
+        .accessibilityElement(children: .ignore)
+        .accessibilityAddTraits(.isImage)
+        .accessibilityLabel(accessibilityDescription)
+    }
+
+    /// Single coherent description for VoiceOver instead of 12 separate layer announcements.
+    private var accessibilityDescription: String {
+        var parts = ["Your character"]
+        if loadout.equippedWings != nil { parts.append("with wings") }
+        if loadout.equippedHorns != nil { parts.append("with horns") }
+        if loadout.equippedWeapon != nil { parts.append("holding a weapon") }
+        return parts.joined(separator: " ")
     }
 
     private func layer(_ name: String) -> some View {

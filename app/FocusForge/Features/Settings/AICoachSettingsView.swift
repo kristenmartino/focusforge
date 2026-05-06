@@ -52,6 +52,8 @@ struct AICoachSettingsView: View {
                             Text("Calm").tag(CoachTone.calm)
                         }
                         .pickerStyle(.segmented)
+                        .accessibilityLabel("Coach tone")
+                        .accessibilityValue(preference.tone.rawValue.capitalized)
                     } header: {
                         Text("Coach Tone")
                     } footer: {
@@ -70,6 +72,8 @@ struct AICoachSettingsView: View {
                             Text("High").tag(NudgeFrequency.high)
                         }
                         .pickerStyle(.segmented)
+                        .accessibilityLabel("Nudge frequency")
+                        .accessibilityValue(preference.nudgeFrequency.rawValue.capitalized)
                     } header: {
                         Text("Nudge Frequency")
                     } footer: {

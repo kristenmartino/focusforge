@@ -10,6 +10,7 @@ struct StreakRescueBannerView: View {
             Image(systemName: "flame.fill")
                 .font(.title3)
                 .foregroundStyle(.orange)
+                .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("Protect your \(streakDays)-day streak!")
@@ -41,7 +42,9 @@ struct StreakRescueBannerView: View {
                 Image(systemName: "xmark")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .frame(minWidth: 44, minHeight: 44)
             }
+            .accessibilityLabel("Dismiss streak nudge")
         }
         .padding(.horizontal)
         .padding(.vertical, 10)

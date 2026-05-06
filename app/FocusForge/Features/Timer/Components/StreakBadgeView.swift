@@ -13,9 +13,10 @@ struct StreakBadgeView: View {
             HStack(spacing: 4) {
                 Image(systemName: "flame.fill")
                     .foregroundStyle(FFTheme.Accent.orange)
-                    .font(.system(size: 12))
+                    .font(.caption)
+                    .accessibilityHidden(true)
                 Text("Day \(streakDays)")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(FFTheme.Accent.orange)
             }
             .padding(.horizontal, 12)
@@ -28,6 +29,8 @@ struct StreakBadgeView: View {
                             .stroke(FFTheme.Accent.orange.opacity(0.20), lineWidth: 0.5)
                     )
             )
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Current streak: \(streakDays) day\(streakDays == 1 ? "" : "s")")
         }
     }
 }

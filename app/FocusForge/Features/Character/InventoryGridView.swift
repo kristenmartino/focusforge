@@ -98,6 +98,7 @@ struct InventoryGridView: View {
                     Image(systemName: "xmark")
                         .font(.title3)
                         .foregroundStyle(FFTheme.Text.secondary)
+                        .accessibilityHidden(true)
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: FFTheme.Radius.md)
@@ -107,9 +108,15 @@ struct InventoryGridView: View {
                                 lineWidth: equippedItemID == nil ? 2 : 0.5)
                 )
             Text("None")
-                .font(.system(size: 10))
+                .font(.caption2)
                 .foregroundStyle(FFTheme.Text.secondary)
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(equippedItemID == nil ? "None, equipped" : "None")
+        .accessibilityHint(equippedItemID == nil
+                           ? "Already unequipped"
+                           : "Tap to unequip current item")
+        .accessibilityAddTraits(equippedItemID == nil ? .isSelected : [])
     }
 
     private func itemCell(_ item: InventoryItem) -> some View {
@@ -140,17 +147,19 @@ struct InventoryGridView: View {
                             .font(.caption)
                             .foregroundStyle(FFTheme.Accent.green)
                             .offset(x: 4, y: -4)
+                            .accessibilityHidden(true)
                     }
                 }
                 .overlay(alignment: .topLeading) {
                     if item.ownership == .new {
                         Text("NEW")
-                            .font(.system(size: 8, weight: .black))
+                            .font(.caption2.weight(.black))
                             .foregroundStyle(FFTheme.Text.primary)
                             .padding(.horizontal, FFTheme.Spacing.xxs)
                             .padding(.vertical, 1)
                             .background(Capsule().fill(FFTheme.Accent.orange))
                             .offset(x: -4, y: -4)
+                            .accessibilityHidden(true)
                     }
                 }
                 .overlay(alignment: .bottom) {
@@ -158,9 +167,9 @@ struct InventoryGridView: View {
                         if item.coinCost > 0 {
                             HStack(spacing: 2) {
                                 Image(systemName: "bitcoinsign.circle.fill")
-                                    .font(.system(size: 9))
+                                    .font(.caption2)
                                 Text("\(item.coinCost)")
-                                    .font(.system(size: 9, weight: .bold))
+                                    .font(.caption2.weight(.bold))
                             }
                             .foregroundStyle(coins >= item.coinCost
                                              ? FFTheme.Accent.gold
@@ -169,18 +178,20 @@ struct InventoryGridView: View {
                             .padding(.vertical, 2)
                             .background(Capsule().fill(FFTheme.Background.primary.opacity(0.7)))
                             .offset(y: 4)
+                            .accessibilityHidden(true)
                         } else {
                             HStack(spacing: 2) {
                                 Image(systemName: "flame.fill")
-                                    .font(.system(size: 9))
+                                    .font(.caption2)
                                 Text("Streak")
-                                    .font(.system(size: 9, weight: .bold))
+                                    .font(.caption2.weight(.bold))
                             }
                             .foregroundStyle(FFTheme.Accent.orange)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
                             .background(Capsule().fill(FFTheme.Background.primary.opacity(0.7)))
                             .offset(y: 4)
+                            .accessibilityHidden(true)
                         }
                     }
                 }
@@ -189,9 +200,37 @@ struct InventoryGridView: View {
                     cornerRadius: FFTheme.Radius.md
                 )
             Text(item.name)
-                .font(.system(size: 10))
+                .font(.caption2)
                 .foregroundStyle(isOwned ? FFTheme.Text.primary : FFTheme.Text.secondary)
                 .lineLimit(1)
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(itemAccessibilityLabel(item, isEquipped: isEquipped, isOwned: isOwned))
+        .accessibilityHint(itemAccessibilityHint(item, isEquipped: isEquipped, isOwned: isOwned))
+        .accessibilityAddTraits(isEquipped ? .isSelected : [])
+    }
+
+    private func itemAccessibilityLabel(_ item: InventoryItem, isEquipped: Bool, isOwned: Bool) -> String {
+        var parts: [String] = [item.name, "\(item.rarity.rawValue) rarity"]
+        if isEquipped { parts.append("equipped") }
+        if item.ownership == .new { parts.append("new") }
+        if !isOwned {
+            if item.coinCost > 0 {
+                parts.append("locked, costs \(item.coinCost) coins")
+            } else {
+                parts.append("locked, unlocks at a streak milestone")
+            }
+        }
+        return parts.joined(separator: ", ")
+    }
+
+    private func itemAccessibilityHint(_ item: InventoryItem, isEquipped: Bool, isOwned: Bool) -> String {
+        if !isOwned && item.coinCost > 0 && coins >= item.coinCost {
+            return "Tap to purchase and equip"
+        }
+        if !isOwned {
+            return "Not yet available"
+        }
+        return isEquipped ? "Tap to unequip" : "Tap to equip"
     }
 }

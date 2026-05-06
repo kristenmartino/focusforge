@@ -74,6 +74,8 @@ struct TimerView: View {
                             Image(systemName: "clock.arrow.circlepath")
                                 .foregroundStyle(FFTheme.Text.secondary)
                         }
+                        .accessibilityLabel("Session history")
+                        .accessibilityHint("Shows your past focus and break sessions")
                     }
                 }
             }
@@ -230,7 +232,7 @@ struct TimerView: View {
         let color = FFTheme.sessionColor(for: engine.currentSessionType)
         return Button(action: startSession) {
             Text("Start \(engine.currentSessionType.displayName)")
-                .font(.system(size: 15, weight: .medium))
+                .font(.body.weight(.medium))
                 .foregroundStyle(FFTheme.Text.primary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
@@ -254,7 +256,7 @@ struct TimerView: View {
     ) -> some View {
         Button(action: action) {
             Label(label, systemImage: icon)
-                .font(.system(size: 14, weight: .medium))
+                .font(.subheadline.weight(.medium))
                 .foregroundStyle(foreground(for: style))
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, FFTheme.Spacing.sm)

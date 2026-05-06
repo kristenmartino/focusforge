@@ -5,6 +5,7 @@ struct MilestoneUnlockView: View {
     let onClaim: () -> Void
 
     @State private var showContent = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ZStack {
@@ -13,6 +14,7 @@ struct MilestoneUnlockView: View {
             if showContent {
                 ParticleField(count: 18)
                     .transition(.opacity)
+                    .accessibilityHidden(true)
             }
 
             VStack(spacing: FFTheme.Spacing.lg) {
@@ -23,7 +25,8 @@ struct MilestoneUnlockView: View {
                     Image(systemName: "trophy.fill")
                         .font(.system(size: 64))
                         .foregroundStyle(rarityColor)
-                        .transition(.scale.combined(with: .opacity))
+                        .transition(reduceMotion ? .opacity : .scale.combined(with: .opacity))
+                        .accessibilityHidden(true)
 
                     Text("Milestone Unlocked!")
                         .font(.rewardHeadline)
@@ -31,7 +34,7 @@ struct MilestoneUnlockView: View {
                         .transition(.opacity)
 
                     Text(milestone.name)
-                        .font(.system(size: 17))
+                        .font(.body)
                         .foregroundStyle(FFTheme.Text.secondary)
                         .transition(.opacity)
 
@@ -42,14 +45,15 @@ struct MilestoneUnlockView: View {
                                 Image(systemName: slotIcon)
                                     .font(.title3)
                                     .foregroundStyle(rarityColor)
+                                    .accessibilityHidden(true)
 
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(milestone.itemName)
-                                        .font(.system(size: 15, weight: .medium))
+                                        .font(.body.weight(.medium))
                                         .foregroundStyle(FFTheme.Text.primary)
 
                                     Text(milestone.itemRarity.rawValue.capitalized)
-                                        .font(.system(size: 11, weight: .semibold))
+                                        .font(.caption.weight(.semibold))
                                         .foregroundStyle(rarityColor)
                                         .padding(.horizontal, 8)
                                         .padding(.vertical, 3)
@@ -64,16 +68,18 @@ struct MilestoneUnlockView: View {
                             // Streak freeze bonus
                             HStack(spacing: 4) {
                                 Image(systemName: "snowflake")
-                                    .font(.system(size: 12))
+                                    .font(.caption)
+                                    .accessibilityHidden(true)
                                 Text("+1 Streak Freeze")
-                                    .font(.system(size: 13))
+                                    .font(.footnote)
                             }
                             .foregroundStyle(FFTheme.Accent.cyan)
                         }
                     }
                     .animatedRareShimmer(if: milestone.itemRarity == .animatedRare)
                     .padding(.horizontal, FFTheme.Spacing.xxl)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .transition(reduceMotion ? .opacity : .move(edge: .bottom).combined(with: .opacity))
+                    .accessibilityElement(children: .combine)
                 }
 
                 Spacer()
@@ -81,7 +87,8 @@ struct MilestoneUnlockView: View {
                 if showContent {
                     AccentPillButton(title: "Claim", action: onClaim, style: .purple)
                         .padding(.horizontal, FFTheme.Spacing.xxxl)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .transition(reduceMotion ? .opacity : .move(edge: .bottom).combined(with: .opacity))
+                        .accessibilityHint("Claims the milestone reward")
                 }
 
                 Spacer()
@@ -89,8 +96,12 @@ struct MilestoneUnlockView: View {
             }
         }
         .task {
-            withAnimation(.easeOut(duration: 0.6)) {
+            if reduceMotion {
                 showContent = true
+            } else {
+                withAnimation(.easeOut(duration: 0.6)) {
+                    showContent = true
+                }
             }
         }
         .presentationDetents([.large])

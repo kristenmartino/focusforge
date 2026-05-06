@@ -70,6 +70,7 @@ struct RewardOverlayView: View {
                         .foregroundStyle(FFTheme.Accent.green)
                         .transition(contentTransition(.scale.combined(with: .opacity)))
                         .padding(.bottom, FFTheme.Spacing.md)
+                        .accessibilityHidden(true)
 
                     // Headline
                     VStack(spacing: 4) {
@@ -83,16 +84,18 @@ struct RewardOverlayView: View {
                     }
                     .transition(contentTransition(.move(edge: .bottom).combined(with: .opacity)))
                     .padding(.bottom, FFTheme.Spacing.lg)
+                    .accessibilityElement(children: .combine)
 
                     // Streak
                     if result.streakDays > 0 {
                         HStack(spacing: 4) {
                             Image(systemName: "flame.fill")
                                 .foregroundStyle(FFTheme.Accent.orange)
+                                .accessibilityHidden(true)
                             Text("Day \(result.streakDays) streak!")
                                 .foregroundStyle(FFTheme.Accent.orange)
                         }
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.subheadline.weight(.semibold))
                         .transition(contentTransition(.opacity))
                         .padding(.bottom, FFTheme.Spacing.xl)
                     }
@@ -111,10 +114,11 @@ struct RewardOverlayView: View {
                     HStack(spacing: 6) {
                         Image(systemName: "arrow.up.circle.fill")
                             .foregroundStyle(FFTheme.Accent.cyan)
+                            .accessibilityHidden(true)
                         Text("Level Up!")
                             .foregroundStyle(FFTheme.Accent.cyan)
                     }
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.subheadline.weight(.semibold))
                     .transition(contentTransition(.scale.combined(with: .opacity)))
                     .padding(.bottom, FFTheme.Spacing.sm)
                 }
@@ -155,13 +159,18 @@ struct RewardOverlayView: View {
                     AccentPillButton(title: "Continue", action: onDismiss, style: .purple)
                         .padding(.horizontal, FFTheme.Spacing.xxxl)
                         .transition(contentTransition(.move(edge: .bottom).combined(with: .opacity)))
+                        .accessibilityHint("Dismisses the reward and returns to the timer")
                 }
 
                 Spacer()
                     .frame(height: FFTheme.Spacing.xxl)
             }
         }
+        .contentShape(Rectangle())
         .onTapGesture {
+            skipToEnd()
+        }
+        .accessibilityAction(named: Text("Skip animation")) {
             skipToEnd()
         }
         .task {
@@ -282,17 +291,17 @@ struct RewardOverlayView: View {
                     target: target,
                     duration: 0.8,
                     prefix: "+",
-                    font: .system(size: 18, weight: .medium),
+                    font: .body.weight(.medium),
                     color: color
                 )
             } else {
                 Text("+0")
-                    .font(.system(size: 18, weight: .medium))
+                    .font(.body.weight(.medium))
                     .foregroundStyle(color)
                     .monospacedDigit()
             }
             Text(label)
-                .font(.system(size: 8, weight: .medium))
+                .font(.caption2.weight(.medium))
                 .foregroundStyle(color.opacity(0.5))
                 .tracking(0.5)
         }
@@ -312,17 +321,19 @@ struct RewardOverlayView: View {
                 Image(systemName: "trophy.fill")
                     .font(.title3)
                     .foregroundStyle(FFTheme.Accent.purple)
+                    .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(milestone.name)
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.footnote.weight(.semibold))
                         .foregroundStyle(FFTheme.Text.primary)
                     Text("New item unlocked!")
-                        .font(.system(size: 11))
+                        .font(.caption)
                         .foregroundStyle(FFTheme.Text.tertiary)
                 }
                 Spacer()
             }
         }
+        .accessibilityElement(children: .combine)
     }
 
     // MARK: - Quest Completions
@@ -335,13 +346,14 @@ struct RewardOverlayView: View {
                         Image(systemName: "scroll.fill")
                             .font(.caption)
                             .foregroundStyle(FFTheme.Accent.cyan)
+                            .accessibilityHidden(true)
                         Text(quest.title)
-                            .font(.system(size: 12, weight: .medium))
+                            .font(.caption.weight(.medium))
                             .foregroundStyle(FFTheme.Text.secondary)
                     }
                 }
                 Text("Claim in the Quests tab")
-                    .font(.system(size: 10))
+                    .font(.caption2)
                     .foregroundStyle(FFTheme.Text.tertiary)
             }
         }

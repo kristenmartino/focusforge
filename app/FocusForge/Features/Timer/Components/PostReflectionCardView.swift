@@ -14,6 +14,7 @@ struct PostReflectionCardView: View {
             HStack(spacing: 8) {
                 Image(systemName: categoryIcon)
                     .foregroundStyle(.cyan)
+                    .accessibilityHidden(true)
                 Text(reflection.tipText)
                     .font(.subheadline)
                     .foregroundStyle(.primary)

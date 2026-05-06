@@ -28,7 +28,7 @@ struct FirstSessionNudgeView: View {
 
                 VStack(spacing: FFTheme.Spacing.xs) {
                     Text("You're All Set!")
-                        .font(.system(size: 22, weight: .bold))
+                        .font(.title2.bold())
                         .foregroundStyle(FFTheme.Text.primary)
 
                     Text("Start your first focus session\nand begin building your streak.")

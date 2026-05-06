@@ -24,21 +24,25 @@ struct SettingsView: View {
                                 value: focusBinding(preset),
                                 in: 1...120
                             )
+                            .accessibilityValue("\(preset.focusDurationSeconds / 60) minutes")
                             Stepper(
                                 "Short break: \(preset.shortBreakDurationSeconds / 60) min",
                                 value: shortBreakBinding(preset),
                                 in: 1...30
                             )
+                            .accessibilityValue("\(preset.shortBreakDurationSeconds / 60) minutes")
                             Stepper(
                                 "Long break: \(preset.longBreakDurationSeconds / 60) min",
                                 value: longBreakBinding(preset),
                                 in: 1...30
                             )
+                            .accessibilityValue("\(preset.longBreakDurationSeconds / 60) minutes")
                             Stepper(
                                 "Sessions before long break: \(preset.sessionsBeforeLongBreak)",
                                 value: sessionsBinding(preset),
                                 in: 1...10
                             )
+                            .accessibilityValue("\(preset.sessionsBeforeLongBreak)")
                         }
                         .listRowBackground(Color.white.opacity(0.04))
                     }

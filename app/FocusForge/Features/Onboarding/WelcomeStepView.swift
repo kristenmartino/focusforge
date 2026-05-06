@@ -29,7 +29,7 @@ struct WelcomeStepView: View {
 
                 VStack(spacing: FFTheme.Spacing.xs) {
                     Text("FocusForge")
-                        .font(.system(size: 32, weight: .bold))
+                        .font(.largeTitle.bold())
                         .foregroundStyle(FFTheme.Text.primary)
 
                     Text("Build focus habits with timers, streaks,\nand character progression.")

@@ -24,11 +24,20 @@ enum FFTheme {
     }
 
     // MARK: - Text
+    //
+    // Opacities chosen to meet WCAG 2.1 AA contrast (4.5:1) on
+    // Background.primary (#0A0A0F). Hierarchy is preserved through
+    // typography (size/weight) rather than opacity alone, since
+    // dropping below ~0.45 fails AA Normal on near-black surfaces.
+    // - primary    16.57:1 — headlines, timer
+    // - secondary   5.30:1 — labels, descriptions
+    // - tertiary    5.30:1 — hints, less critical (use smaller fonts to differentiate)
+    // - disabled    1.46:1 — disabled state only (WCAG 1.4.3 exempt)
 
     enum Text {
         static let primary = Color.white.opacity(0.92)
         static let secondary = Color.white.opacity(0.50)
-        static let tertiary = Color.white.opacity(0.30)
+        static let tertiary = Color.white.opacity(0.50)
         static let disabled = Color.white.opacity(0.15)
     }
 
@@ -60,10 +69,19 @@ enum FFTheme {
     }
 
     // MARK: - Rarity
+    //
+    // Brightened from style-guide §6.2 hex values to meet WCAG AA
+    // contrast (4.5:1) when used as text on Background.primary. The
+    // muted style-guide colors (#888888 / #9B59B6 / #E67E22) work for
+    // borders and decorative fills (not subject to text contrast req)
+    // but failed AA when applied as a text foreground. New values:
+    // - common        5.57:1 (already passes)
+    // - rare          6.25:1 (was 4.23 — failed)
+    // - animatedRare  6.93:1 (already passes)
 
     enum Rarity {
         static let common = Color(hex: "#888888")
-        static let rare = Color(hex: "#9B59B6")
+        static let rare = Color(hex: "#B07DCB")
         static let animatedRare = Color(hex: "#E67E22")
     }
 

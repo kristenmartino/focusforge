@@ -72,7 +72,7 @@ private struct SessionRowView: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text(session.taskName.isEmpty ? sessionTypeLabel : session.taskName)
-                    .font(.system(size: 15))
+                    .font(.body)
                     .foregroundStyle(FFTheme.Text.primary)
                 Text(durationLabel)
                     .font(.caption)
@@ -85,19 +85,24 @@ private struct SessionRowView: View {
                 if session.xpEarned > 0 {
                     HStack(spacing: 3) {
                         Image(systemName: "star.fill")
-                            .font(.system(size: 10))
+                            .font(.caption2)
+                            .accessibilityHidden(true)
                         Text("\(session.xpEarned)")
                             .font(.caption)
                     }
                     .foregroundStyle(FFTheme.Accent.gold)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("\(session.xpEarned) XP")
                 }
 
                 Image(systemName: outcomeIcon)
                     .foregroundStyle(outcomeColor)
-                    .font(.system(size: 14))
+                    .font(.subheadline)
+                    .accessibilityLabel(session.outcome == .completed ? "Completed" : "Abandoned")
             }
         }
         .padding(.vertical, 2)
+        .accessibilityElement(children: .combine)
     }
 
     private var sessionTypeLabel: String {

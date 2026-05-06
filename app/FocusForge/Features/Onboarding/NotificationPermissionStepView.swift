@@ -29,7 +29,7 @@ struct NotificationPermissionStepView: View {
 
                 VStack(spacing: FFTheme.Spacing.xs) {
                     Text("Stay on Track")
-                        .font(.system(size: 22, weight: .bold))
+                        .font(.title2.bold())
                         .foregroundStyle(FFTheme.Text.primary)
 
                     Text("Get notified when your timer completes,\neven if the app is in the background.")
@@ -58,7 +58,9 @@ struct NotificationPermissionStepView: View {
                         Text("Not Now")
                             .font(.subheadline)
                             .foregroundStyle(FFTheme.Text.tertiary)
+                            .frame(maxWidth: .infinity, minHeight: 44)
                     }
+                    .accessibilityHint("Skips notification permission; you can enable it later in Settings")
                 }
 
                 Spacer()

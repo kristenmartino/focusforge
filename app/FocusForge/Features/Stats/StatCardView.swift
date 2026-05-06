@@ -11,6 +11,7 @@ struct StatCardView: View {
             Image(systemName: icon)
                 .font(.title2)
                 .foregroundStyle(color)
+                .accessibilityHidden(true)
 
             Text(value)
                 .font(.statNumber)
@@ -30,6 +31,8 @@ struct StatCardView: View {
                         .stroke(color.opacity(0.10), lineWidth: 0.5)
                 )
         )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title): \(value)")
     }
 }
 
