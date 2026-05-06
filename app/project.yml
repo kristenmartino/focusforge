@@ -8,6 +8,11 @@ options:
   generateEmptyDirectories: true
   groupSortPosition: top
 
+packages:
+  Firebase:
+    url: https://github.com/firebase/firebase-ios-sdk
+    from: "11.0.0"
+
 settings:
   base:
     MARKETING_VERSION: "0.1.0"
@@ -27,6 +32,24 @@ targets:
           - "Preview Content"
       - path: FocusForge/Preview Content
         buildPhase: none
+    dependencies:
+      - package: Firebase
+        product: FirebaseAnalytics
+      - package: Firebase
+        product: FirebaseCrashlytics
+      - package: Firebase
+        product: FirebaseRemoteConfig
+    postBuildScripts:
+      - name: Upload Crashlytics dSYMs
+        script: |
+          if [ "${CONFIGURATION}" = "Release" ]; then
+            "${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run" \
+              -gsp "${PROJECT_DIR}/FocusForge/GoogleService-Info.plist" \
+              -p ios "${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}"
+          fi
+        inputFiles:
+          - "$(DWARF_DSYM_FOLDER_PATH)/$(DWARF_DSYM_FILE_NAME)/Contents/Resources/DWARF/$(TARGET_NAME)"
+          - "$(SRCROOT)/FocusForge/GoogleService-Info.plist"
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.focusforge.app

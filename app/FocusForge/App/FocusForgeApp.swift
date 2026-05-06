@@ -1,8 +1,14 @@
 import SwiftUI
 import SwiftData
+import FirebaseCore
 
 @main
 struct FocusForgeApp: App {
+    init() {
+        FirebaseApp.configure()
+        AnalyticsService.backend = FirebaseAnalyticsBackend()
+    }
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             UserProfile.self,
