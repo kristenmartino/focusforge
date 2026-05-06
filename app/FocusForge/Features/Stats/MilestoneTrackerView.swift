@@ -94,13 +94,7 @@ struct MilestoneRowView: View {
         .opacity(isEarned ? 1.0 : 0.75)
     }
 
-    private var rarityColor: Color {
-        switch milestone.itemRarity {
-        case .common: FFTheme.Rarity.common
-        case .rare: FFTheme.Rarity.rare
-        case .animatedRare: FFTheme.Rarity.animatedRare
-        }
-    }
+    private var rarityColor: Color { milestone.itemRarity.color }
 
     private var slotIcon: String {
         switch milestone.itemSlot {
