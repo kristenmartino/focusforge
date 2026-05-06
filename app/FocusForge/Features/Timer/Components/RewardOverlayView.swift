@@ -1,42 +1,77 @@
 import SwiftUI
 
-struct SessionCompletionView: View {
+/// Full-screen cinematic reward overlay. Replaces the sheet-based SessionCompletionView
+/// with an in-place transition that morphs the timer screen into the reward screen.
+///
+/// Animation sequence:
+/// Beat 1 (t=0):     Ring pulse on timer position
+/// Beat 2 (t=400ms): Background crossfade focus → reward
+/// Beat 3 (t=800ms): Particles + checkmark + headline
+/// Beat 4 (t=1200ms): Reward card slides up
+/// Beat 5 (t=1600ms): CTA button + number count-up
+///
+/// Tap anywhere to skip to final state. Respects reduce motion.
+struct RewardOverlayView: View {
     let sessionType: SessionPhase
     let duration: TimeInterval
     let result: SessionResult
+    let ringSize: CGFloat
     var reflection: ReflectionResult? = nil
     var onReflectionFeedback: ((Bool) -> Void)? = nil
     let onDismiss: () -> Void
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    // Animation phase states
+    @State private var showPulse = false
+    @State private var showRewardBg = false
     @State private var showContent = false
     @State private var showRewards = false
     @State private var showButton = false
+    @State private var startCountUp = false
+    @State private var sequenceComplete = false
 
     var body: some View {
         ZStack {
-            // Atmospheric reward background
-            RewardBackground()
+            // MARK: - Background layers
 
-            // Particle field
+            // Focus background (fades out)
+            FocusBackground(accentColor: FFTheme.sessionColor(for: sessionType))
+                .opacity(showRewardBg ? 0 : 1)
+
+            // Reward background (fades in)
+            RewardBackground()
+                .opacity(showRewardBg ? 1 : 0)
+
+            // Particles
             if showContent {
-                ParticleField(count: 14)
-                    .transition(.opacity)
+                ParticleField(count: 16)
+                    .transition(reduceMotion ? .opacity : .opacity)
             }
+
+            // MARK: - Ring pulse (beat 1)
+
+            if showPulse && !showContent {
+                RingPulseView(
+                    color: FFTheme.sessionColor(for: sessionType),
+                    ringSize: ringSize
+                )
+            }
+
+            // MARK: - Reward content
 
             VStack(spacing: 0) {
                 Spacer()
 
-                // Completion icon
                 if showContent {
+                    // Checkmark
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 56))
                         .foregroundStyle(FFTheme.Accent.green)
-                        .transition(.scale.combined(with: .opacity))
+                        .transition(contentTransition(.scale.combined(with: .opacity)))
                         .padding(.bottom, FFTheme.Spacing.md)
-                }
 
-                // Headline
-                if showContent {
+                    // Headline
                     VStack(spacing: 4) {
                         Text("\(sessionType.displayName) Complete!")
                             .font(.rewardHeadline)
@@ -46,27 +81,27 @@ struct SessionCompletionView: View {
                             .font(.rewardSubhead)
                             .foregroundStyle(FFTheme.Text.tertiary)
                     }
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .transition(contentTransition(.move(edge: .bottom).combined(with: .opacity)))
                     .padding(.bottom, FFTheme.Spacing.lg)
-                }
 
-                // Streak callout
-                if showContent && result.streakDays > 0 {
-                    HStack(spacing: 4) {
-                        Image(systemName: "flame.fill")
-                            .foregroundStyle(FFTheme.Accent.orange)
-                        Text("Day \(result.streakDays) streak!")
-                            .foregroundStyle(FFTheme.Accent.orange)
+                    // Streak
+                    if result.streakDays > 0 {
+                        HStack(spacing: 4) {
+                            Image(systemName: "flame.fill")
+                                .foregroundStyle(FFTheme.Accent.orange)
+                            Text("Day \(result.streakDays) streak!")
+                                .foregroundStyle(FFTheme.Accent.orange)
+                        }
+                        .font(.system(size: 15, weight: .semibold))
+                        .transition(contentTransition(.opacity))
+                        .padding(.bottom, FFTheme.Spacing.xl)
                     }
-                    .font(.system(size: 15, weight: .semibold))
-                    .padding(.bottom, FFTheme.Spacing.xl)
-                    .transition(.opacity)
                 }
 
                 // Rewards card
                 if showRewards && (result.xp > 0 || result.coins > 0) {
                     rewardsCard
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .transition(contentTransition(.move(edge: .bottom).combined(with: .opacity)))
                         .padding(.horizontal, FFTheme.Spacing.xxl)
                         .padding(.bottom, FFTheme.Spacing.md)
                 }
@@ -80,14 +115,14 @@ struct SessionCompletionView: View {
                             .foregroundStyle(FFTheme.Accent.cyan)
                     }
                     .font(.system(size: 15, weight: .semibold))
-                    .transition(.scale.combined(with: .opacity))
+                    .transition(contentTransition(.scale.combined(with: .opacity)))
                     .padding(.bottom, FFTheme.Spacing.sm)
                 }
 
                 // Milestone preview
                 if showRewards, let milestone = result.newMilestone {
                     milestonePreview(milestone)
-                        .transition(.opacity)
+                        .transition(contentTransition(.opacity))
                         .padding(.horizontal, FFTheme.Spacing.xxl)
                         .padding(.bottom, FFTheme.Spacing.sm)
                 }
@@ -95,7 +130,7 @@ struct SessionCompletionView: View {
                 // Quest completions
                 if showRewards && !result.completedQuests.isEmpty {
                     questsCompleted
-                        .transition(.opacity)
+                        .transition(contentTransition(.opacity))
                         .padding(.horizontal, FFTheme.Spacing.xxl)
                         .padding(.bottom, FFTheme.Spacing.sm)
                 }
@@ -110,38 +145,104 @@ struct SessionCompletionView: View {
                     )
                     .padding(.horizontal, FFTheme.Spacing.xxl)
                     .padding(.bottom, FFTheme.Spacing.sm)
-                    .transition(.opacity)
+                    .transition(contentTransition(.opacity))
                 }
 
                 Spacer()
 
-                // CTA
+                // CTA button
                 if showButton {
                     AccentPillButton(title: "Continue", action: onDismiss, style: .purple)
                         .padding(.horizontal, FFTheme.Spacing.xxxl)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .transition(contentTransition(.move(edge: .bottom).combined(with: .opacity)))
                 }
 
                 Spacer()
                     .frame(height: FFTheme.Spacing.xxl)
             }
         }
+        .onTapGesture {
+            skipToEnd()
+        }
         .task {
-            // Cinematic reveal sequence
-            withAnimation(.easeOut(duration: 0.5)) {
-                showContent = true
-            }
-            try? await Task.sleep(for: .milliseconds(400))
-            withAnimation(.easeOut(duration: 0.4)) {
-                showRewards = true
-            }
-            try? await Task.sleep(for: .milliseconds(300))
-            withAnimation(.easeOut(duration: 0.3)) {
-                showButton = true
+            if reduceMotion {
+                runReducedMotionSequence()
+            } else {
+                await runFullSequence()
             }
         }
-        .presentationDetents([.large])
-        .interactiveDismissDisabled()
+    }
+
+    // MARK: - Animation Sequence
+
+    private func runFullSequence() async {
+        // Beat 1: Ring pulse
+        withAnimation(.easeOut(duration: 0.6)) {
+            showPulse = true
+        }
+
+        try? await Task.sleep(for: .milliseconds(400))
+        guard !sequenceComplete else { return }
+
+        // Beat 2: Background shift
+        withAnimation(.easeOut(duration: 0.6)) {
+            showRewardBg = true
+        }
+
+        try? await Task.sleep(for: .milliseconds(400))
+        guard !sequenceComplete else { return }
+
+        // Beat 3: Content (checkmark, headline, streak)
+        withAnimation(.spring(duration: 0.5, bounce: 0.15)) {
+            showContent = true
+        }
+
+        try? await Task.sleep(for: .milliseconds(400))
+        guard !sequenceComplete else { return }
+
+        // Beat 4: Rewards card
+        withAnimation(.easeOut(duration: 0.4)) {
+            showRewards = true
+            startCountUp = true
+        }
+
+        try? await Task.sleep(for: .milliseconds(400))
+        guard !sequenceComplete else { return }
+
+        // Beat 5: CTA button
+        withAnimation(.easeOut(duration: 0.3)) {
+            showButton = true
+        }
+        sequenceComplete = true
+    }
+
+    private func runReducedMotionSequence() {
+        withAnimation(.easeOut(duration: 0.3)) {
+            showRewardBg = true
+            showContent = true
+            showRewards = true
+            showButton = true
+            startCountUp = true
+            sequenceComplete = true
+        }
+    }
+
+    private func skipToEnd() {
+        guard !sequenceComplete else { return }
+        sequenceComplete = true
+        withAnimation(.easeOut(duration: 0.2)) {
+            showPulse = false
+            showRewardBg = true
+            showContent = true
+            showRewards = true
+            showButton = true
+            startCountUp = true
+        }
+    }
+
+    /// Returns the appropriate transition based on reduce motion setting.
+    private func contentTransition(_ standard: AnyTransition) -> AnyTransition {
+        reduceMotion ? .opacity : standard
     }
 
     // MARK: - Rewards Card
@@ -151,21 +252,21 @@ struct SessionCompletionView: View {
             HStack(spacing: FFTheme.Spacing.xs) {
                 if result.xp > 0 {
                     rewardPill(
-                        value: "+\(result.xp)",
+                        target: result.xp,
                         label: "XP",
                         color: FFTheme.Accent.gold
                     )
                 }
                 if result.coins > 0 {
                     rewardPill(
-                        value: "+\(result.coins)",
+                        target: result.coins,
                         label: "COINS",
                         color: FFTheme.Accent.orange
                     )
                 }
                 if result.bonusXP > 0 {
                     rewardPill(
-                        value: "+\(result.bonusXP)",
+                        target: result.bonusXP,
                         label: "BONUS",
                         color: FFTheme.Accent.gold.opacity(0.7)
                     )
@@ -174,11 +275,22 @@ struct SessionCompletionView: View {
         }
     }
 
-    private func rewardPill(value: String, label: String, color: Color) -> some View {
+    private func rewardPill(target: Int, label: String, color: Color) -> some View {
         VStack(spacing: 2) {
-            Text(value)
-                .font(.system(size: 18, weight: .medium))
-                .foregroundStyle(color)
+            if startCountUp {
+                CountUpText(
+                    target: target,
+                    duration: 0.8,
+                    prefix: "+",
+                    font: .system(size: 18, weight: .medium),
+                    color: color
+                )
+            } else {
+                Text("+0")
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundStyle(color)
+                    .monospacedDigit()
+            }
             Text(label)
                 .font(.system(size: 8, weight: .medium))
                 .foregroundStyle(color.opacity(0.5))
@@ -200,7 +312,6 @@ struct SessionCompletionView: View {
                 Image(systemName: "trophy.fill")
                     .font(.title3)
                     .foregroundStyle(FFTheme.Accent.purple)
-
                 VStack(alignment: .leading, spacing: 2) {
                     Text(milestone.name)
                         .font(.system(size: 13, weight: .semibold))
@@ -209,7 +320,6 @@ struct SessionCompletionView: View {
                         .font(.system(size: 11))
                         .foregroundStyle(FFTheme.Text.tertiary)
                 }
-
                 Spacer()
             }
         }
@@ -239,7 +349,7 @@ struct SessionCompletionView: View {
 }
 
 #Preview {
-    SessionCompletionView(
+    RewardOverlayView(
         sessionType: .focus,
         duration: 1500,
         result: SessionResult(
@@ -251,6 +361,7 @@ struct SessionCompletionView: View {
             leveledUp: false,
             completedQuests: []
         ),
+        ringSize: 260,
         onDismiss: {}
     )
 }

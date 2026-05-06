@@ -6,24 +6,36 @@ struct SessionHistoryView: View {
     private var sessions: [SessionLog]
 
     var body: some View {
-        List {
-            if sessions.isEmpty {
-                ContentUnavailableView(
-                    "No Sessions Yet",
-                    systemImage: "clock",
-                    description: Text("Complete a focus session to see your history.")
-                )
-            } else {
-                ForEach(groupedSessions, id: \.date) { group in
-                    Section(group.dateLabel) {
-                        ForEach(group.sessions) { session in
-                            SessionRowView(session: session)
+        ZStack {
+            FFTheme.Background.primary.ignoresSafeArea()
+
+            Group {
+                if sessions.isEmpty {
+                    ContentUnavailableView(
+                        "No Sessions Yet",
+                        systemImage: "clock",
+                        description: Text("Complete a focus session to see your history.")
+                    )
+                } else {
+                    List {
+                        ForEach(groupedSessions, id: \.date) { group in
+                            Section {
+                                ForEach(group.sessions) { session in
+                                    SessionRowView(session: session)
+                                }
+                                .listRowBackground(Color.white.opacity(0.04))
+                            } header: {
+                                Text(group.dateLabel)
+                                    .foregroundStyle(FFTheme.Text.tertiary)
+                            }
                         }
                     }
+                    .scrollContentBackground(.hidden)
                 }
             }
         }
         .navigationTitle("History")
+        .darkNavigationAppearance()
     }
 
     private var groupedSessions: [DayGroup] {
@@ -60,23 +72,29 @@ private struct SessionRowView: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text(session.taskName.isEmpty ? sessionTypeLabel : session.taskName)
-                    .font(.body)
+                    .font(.system(size: 15))
+                    .foregroundStyle(FFTheme.Text.primary)
                 Text(durationLabel)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(FFTheme.Text.tertiary)
             }
 
             Spacer()
 
             HStack(spacing: 12) {
                 if session.xpEarned > 0 {
-                    Label("\(session.xpEarned)", systemImage: "star.fill")
-                        .font(.caption)
-                        .foregroundStyle(.yellow)
+                    HStack(spacing: 3) {
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 10))
+                        Text("\(session.xpEarned)")
+                            .font(.caption)
+                    }
+                    .foregroundStyle(FFTheme.Accent.gold)
                 }
 
                 Image(systemName: outcomeIcon)
                     .foregroundStyle(outcomeColor)
+                    .font(.system(size: 14))
             }
         }
         .padding(.vertical, 2)
@@ -84,9 +102,9 @@ private struct SessionRowView: View {
 
     private var sessionTypeLabel: String {
         switch session.sessionType {
-        case .focus: return "Focus Session"
-        case .shortBreak: return "Short Break"
-        case .longBreak: return "Long Break"
+        case .focus: "Focus Session"
+        case .shortBreak: "Short Break"
+        case .longBreak: "Long Break"
         }
     }
 
@@ -104,7 +122,7 @@ private struct SessionRowView: View {
     }
 
     private var outcomeColor: Color {
-        session.outcome == .completed ? .green : .red
+        session.outcome == .completed ? FFTheme.Accent.green : FFTheme.Accent.red
     }
 }
 

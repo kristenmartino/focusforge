@@ -12,7 +12,7 @@ struct TimerView: View {
     @Query private var coachPreferences: [AICoachPreference]
 
     @State private var taskName: String = ""
-    @State private var showCompletion = false
+    @State private var showRewardOverlay = false
     @State private var completionResult: SessionResult?
     @State private var completionReflection: ReflectionResult?
     @State private var showMilestone = false
@@ -20,81 +20,60 @@ struct TimerView: View {
     @State private var showIntentFraming = false
     @State private var currentFraming: FramingResult?
 
+    private let ringSize: CGFloat = 260
+
     var body: some View {
         NavigationStack {
             ZStack {
-                // Atmospheric background
+                // Focus mode background (always present, fades under reward)
                 FocusBackground(
                     accentColor: FFTheme.sessionColor(for: engine.currentSessionType)
                 )
 
-                // Content
-                VStack(spacing: 0) {
-                    Spacer()
+                // Timer content — hidden during reward overlay
+                if !showRewardOverlay {
+                    timerContent
+                        .transition(.opacity)
+                }
 
-                    // Streak badge
-                    StreakBadgeView()
-                        .padding(.bottom, FFTheme.Spacing.sm)
-
-                    // Session type label
-                    Text(engine.currentSessionType.displayName.uppercased())
-                        .font(.sessionLabel)
-                        .foregroundStyle(FFTheme.Text.tertiary)
-                        .tracking(2)
-                        .padding(.bottom, FFTheme.Spacing.lg)
-
-                    // Timer ring + display
-                    ZStack {
-                        GlowProgressRingView(
-                            progress: engine.progress,
-                            sessionType: engine.currentSessionType
-                        )
-
-                        VStack(spacing: 4) {
-                            Text(engine.formattedTime)
-                                .font(.timerDisplay)
-                                .foregroundStyle(FFTheme.Text.primary)
-                                .monospacedDigit()
-                                .contentTransition(.numericText())
-                                .accessibilityLabel(
-                                    "Time remaining: \(engine.accessibleTimeDescription)"
+                // Reward overlay (replaces timer in-place with cinematic sequence)
+                if showRewardOverlay, let result = completionResult {
+                    RewardOverlayView(
+                        sessionType: engine.currentSessionType,
+                        duration: engine.totalDuration,
+                        result: result,
+                        ringSize: ringSize,
+                        reflection: completionReflection,
+                        onReflectionFeedback: { accepted in
+                            if let reflection = completionReflection {
+                                logReflectionInteraction(
+                                    templateID: reflection.templateID,
+                                    outcome: accepted ? .accepted : .dismissed
                                 )
-                        }
-                    }
-                    .padding(.bottom, FFTheme.Spacing.lg)
-
-                    // Task name
-                    if engine.state == .idle {
-                        taskNameField
-                    } else if !taskName.isEmpty {
-                        Text(taskName)
-                            .font(.subheadline)
-                            .foregroundStyle(FFTheme.Text.tertiary)
-                    }
-
-                    Spacer()
-
-                    // Controls
-                    timerControls
-                        .padding(.bottom, FFTheme.Spacing.xxxl)
-
-                    Spacer()
+                            }
+                        },
+                        onDismiss: dismissReward
+                    )
+                    .transition(.opacity)
+                    .zIndex(10)
                 }
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Text("Timer")
-                        .font(.headline)
-                        .foregroundStyle(FFTheme.Text.primary)
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink {
-                        SessionHistoryView()
-                    } label: {
-                        Image(systemName: "clock.arrow.circlepath")
-                            .foregroundStyle(FFTheme.Text.secondary)
+                if !showRewardOverlay {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Text("Timer")
+                            .font(.headline)
+                            .foregroundStyle(FFTheme.Text.primary)
+                    }
+                    ToolbarItem(placement: .topBarTrailing) {
+                        NavigationLink {
+                            SessionHistoryView()
+                        } label: {
+                            Image(systemName: "clock.arrow.circlepath")
+                                .foregroundStyle(FFTheme.Text.secondary)
+                        }
                     }
                 }
             }
@@ -125,28 +104,6 @@ struct TimerView: View {
                     )
                 }
             }
-            .sheet(isPresented: $showCompletion, onDismiss: dismissCompletion) {
-                SessionCompletionView(
-                    sessionType: engine.currentSessionType,
-                    duration: engine.totalDuration,
-                    result: completionResult ?? SessionResult(
-                        xp: 0, coins: 0, streakDays: 0,
-                        bonusXP: 0, newMilestone: nil, leveledUp: false,
-                        completedQuests: []
-                    ),
-                    reflection: completionReflection,
-                    onReflectionFeedback: { accepted in
-                        if let reflection = completionReflection {
-                            logReflectionInteraction(
-                                templateID: reflection.templateID,
-                                outcome: accepted ? .accepted : .dismissed
-                            )
-                        }
-                    },
-                    onDismiss: dismissCompletion
-                )
-                .presentationBackground(Color.clear)
-            }
             .sheet(isPresented: $showMilestone) {
                 if let milestone = pendingMilestone {
                     MilestoneUnlockView(milestone: milestone) {
@@ -156,6 +113,56 @@ struct TimerView: View {
                     .presentationBackground(Color.clear)
                 }
             }
+        }
+    }
+
+    // MARK: - Timer Content
+
+    private var timerContent: some View {
+        VStack(spacing: 0) {
+            Spacer()
+
+            StreakBadgeView()
+                .padding(.bottom, FFTheme.Spacing.sm)
+
+            Text(engine.currentSessionType.displayName.uppercased())
+                .font(.sessionLabel)
+                .foregroundStyle(FFTheme.Text.tertiary)
+                .tracking(2)
+                .padding(.bottom, FFTheme.Spacing.lg)
+
+            ZStack {
+                GlowProgressRingView(
+                    progress: engine.progress,
+                    sessionType: engine.currentSessionType,
+                    size: ringSize
+                )
+
+                Text(engine.formattedTime)
+                    .font(.timerDisplay)
+                    .foregroundStyle(FFTheme.Text.primary)
+                    .monospacedDigit()
+                    .contentTransition(.numericText())
+                    .accessibilityLabel(
+                        "Time remaining: \(engine.accessibleTimeDescription)"
+                    )
+            }
+            .padding(.bottom, FFTheme.Spacing.lg)
+
+            if engine.state == .idle {
+                taskNameField
+            } else if !taskName.isEmpty {
+                Text(taskName)
+                    .font(.subheadline)
+                    .foregroundStyle(FFTheme.Text.tertiary)
+            }
+
+            Spacer()
+
+            timerControls
+                .padding(.bottom, FFTheme.Spacing.xxxl)
+
+            Spacer()
         }
     }
 
@@ -172,7 +179,7 @@ struct TimerView: View {
             .multilineTextAlignment(.center)
             .submitLabel(.done)
             .padding(.vertical, 10)
-            .padding(.horizontal, 20)
+            .padding(.horizontal, FFTheme.Spacing.lg)
             .background(
                 RoundedRectangle(cornerRadius: FFTheme.Radius.sm)
                     .fill(Color.white.opacity(0.04))
@@ -182,7 +189,7 @@ struct TimerView: View {
                     )
             )
         }
-        .padding(.horizontal, 40)
+        .padding(.horizontal, FFTheme.Spacing.xxxl)
         .accessibilityLabel("Task name, optional")
     }
 
@@ -193,45 +200,26 @@ struct TimerView: View {
             switch engine.state {
             case .idle:
                 startButton
-
             case .running:
                 HStack(spacing: FFTheme.Spacing.md) {
-                    controlButton(
-                        label: "Pause",
-                        icon: "pause.fill",
-                        style: .secondary
-                    ) {
+                    controlButton(label: "Pause", icon: "pause.fill", style: .secondary) {
                         engine.pause()
                     }
-                    controlButton(
-                        label: "Cancel",
-                        icon: "xmark",
-                        style: .destructive
-                    ) {
+                    controlButton(label: "Cancel", icon: "xmark", style: .destructive) {
                         cancelSession()
                     }
                 }
                 .padding(.horizontal, FFTheme.Spacing.xl)
-
             case .paused:
                 HStack(spacing: FFTheme.Spacing.md) {
-                    controlButton(
-                        label: "Resume",
-                        icon: "play.fill",
-                        style: .primary
-                    ) {
+                    controlButton(label: "Resume", icon: "play.fill", style: .primary) {
                         engine.resume()
                     }
-                    controlButton(
-                        label: "Cancel",
-                        icon: "xmark",
-                        style: .destructive
-                    ) {
+                    controlButton(label: "Cancel", icon: "xmark", style: .destructive) {
                         cancelSession()
                     }
                 }
                 .padding(.horizontal, FFTheme.Spacing.xl)
-
             case .completed:
                 EmptyView()
             }
@@ -240,11 +228,10 @@ struct TimerView: View {
 
     private var startButton: some View {
         let color = FFTheme.sessionColor(for: engine.currentSessionType)
-
         return Button(action: startSession) {
             Text("Start \(engine.currentSessionType.displayName)")
                 .font(.system(size: 15, weight: .medium))
-                .foregroundStyle(.white)
+                .foregroundStyle(FFTheme.Text.primary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
                 .background(
@@ -253,7 +240,7 @@ struct TimerView: View {
                 )
         }
         .buttonStyle(.plain)
-        .padding(.horizontal, 40)
+        .padding(.horizontal, FFTheme.Spacing.xxxl)
         .accessibilityHint(
             "Starts a \(engine.currentSessionType.displayName.lowercased()) session"
         )
@@ -262,56 +249,46 @@ struct TimerView: View {
     private enum ControlStyle { case primary, secondary, destructive }
 
     private func controlButton(
-        label: String,
-        icon: String,
-        style: ControlStyle,
+        label: String, icon: String, style: ControlStyle,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
             Label(label, systemImage: icon)
                 .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(foregroundColor(for: style))
+                .foregroundStyle(foreground(for: style))
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
+                .padding(.vertical, FFTheme.Spacing.sm)
                 .background(
                     RoundedRectangle(cornerRadius: FFTheme.Radius.sm)
-                        .fill(backgroundColor(for: style))
+                        .fill(background(for: style))
                         .overlay(
                             RoundedRectangle(cornerRadius: FFTheme.Radius.sm)
-                                .stroke(borderColor(for: style), lineWidth: 0.5)
+                                .stroke(border(for: style), lineWidth: 0.5)
                         )
                 )
         }
         .buttonStyle(.plain)
     }
 
-    private func foregroundColor(for style: ControlStyle) -> Color {
-        switch style {
-        case .primary: .white
+    private func foreground(for s: ControlStyle) -> Color {
+        switch s {
+        case .primary: FFTheme.Text.primary
         case .secondary: FFTheme.Text.secondary
         case .destructive: FFTheme.Accent.red.opacity(0.8)
         }
     }
-
-    private func backgroundColor(for style: ControlStyle) -> Color {
-        switch style {
-        case .primary:
-            FFTheme.sessionColor(for: engine.currentSessionType).opacity(0.15)
-        case .secondary:
-            Color.white.opacity(0.06)
-        case .destructive:
-            FFTheme.Accent.red.opacity(0.08)
+    private func background(for s: ControlStyle) -> Color {
+        switch s {
+        case .primary: FFTheme.sessionColor(for: engine.currentSessionType).opacity(0.15)
+        case .secondary: Color.white.opacity(0.06)
+        case .destructive: FFTheme.Accent.red.opacity(0.08)
         }
     }
-
-    private func borderColor(for style: ControlStyle) -> Color {
-        switch style {
-        case .primary:
-            FFTheme.sessionColor(for: engine.currentSessionType).opacity(0.3)
-        case .secondary:
-            FFTheme.Border.default
-        case .destructive:
-            FFTheme.Accent.red.opacity(0.2)
+    private func border(for s: ControlStyle) -> Color {
+        switch s {
+        case .primary: FFTheme.sessionColor(for: engine.currentSessionType).opacity(0.3)
+        case .secondary: FFTheme.Border.default
+        case .destructive: FFTheme.Accent.red.opacity(0.2)
         }
     }
 
@@ -319,11 +296,7 @@ struct TimerView: View {
 
     private var presetDurations: [Int] {
         guard let preset = presets.first else { return [] }
-        return [
-            preset.focusDurationSeconds,
-            preset.shortBreakDurationSeconds,
-            preset.longBreakDurationSeconds,
-        ]
+        return [preset.focusDurationSeconds, preset.shortBreakDurationSeconds, preset.longBreakDurationSeconds]
     }
 
     private func syncPresetToEngine() {
@@ -362,51 +335,34 @@ struct TimerView: View {
 
     private func startSessionDirectly() {
         guard let preset = presets.first else { return }
-
-        let duration: TimeInterval
-        switch engine.currentSessionType {
-        case .focus:
-            duration = TimeInterval(preset.focusDurationSeconds)
-        case .shortBreak:
-            duration = TimeInterval(preset.shortBreakDurationSeconds)
-        case .longBreak:
-            duration = TimeInterval(preset.longBreakDurationSeconds)
+        let duration: TimeInterval = switch engine.currentSessionType {
+        case .focus: TimeInterval(preset.focusDurationSeconds)
+        case .shortBreak: TimeInterval(preset.shortBreakDurationSeconds)
+        case .longBreak: TimeInterval(preset.longBreakDurationSeconds)
         }
-
         engine.taskName = taskName
         engine.start(duration: duration, sessionType: engine.currentSessionType)
-        notificationService.scheduleCompletion(
-            in: duration, sessionType: engine.currentSessionType
-        )
+        notificationService.scheduleCompletion(in: duration, sessionType: engine.currentSessionType)
     }
 
     private func cancelSession() {
         let startedAt: Date?
-        if case .running(let date) = engine.state {
-            startedAt = date
-        } else if case .paused = engine.state {
-            startedAt = Date.now.addingTimeInterval(
-                -(engine.totalDuration - engine.remainingSeconds)
-            )
-        } else {
-            startedAt = nil
-        }
+        if case .running(let date) = engine.state { startedAt = date }
+        else if case .paused = engine.state {
+            startedAt = Date.now.addingTimeInterval(-(engine.totalDuration - engine.remainingSeconds))
+        } else { startedAt = nil }
 
         let plannedDuration = engine.totalDuration
         let actualDuration = engine.totalDuration - engine.remainingSeconds
         let sessionType = engine.currentSessionType
-
         engine.cancel()
         notificationService.cancelPending()
 
         if let startedAt {
             SessionLogger.logAbandonment(
-                taskName: taskName,
-                sessionType: sessionType,
-                plannedDuration: plannedDuration,
-                actualDuration: actualDuration,
-                startedAt: startedAt,
-                in: modelContext
+                taskName: taskName, sessionType: sessionType,
+                plannedDuration: plannedDuration, actualDuration: actualDuration,
+                startedAt: startedAt, in: modelContext
             )
         }
     }
@@ -418,8 +374,7 @@ struct TimerView: View {
         case .running:
             if case .paused = oldState {
                 notificationService.scheduleCompletion(
-                    in: engine.remainingSeconds,
-                    sessionType: engine.currentSessionType
+                    in: engine.remainingSeconds, sessionType: engine.currentSessionType
                 )
             }
         case .completed:
@@ -460,21 +415,24 @@ struct TimerView: View {
             completionReflection = nil
         }
 
-        showCompletion = true
+        withAnimation(.easeOut(duration: 0.3)) {
+            showRewardOverlay = true
+        }
 
-        // Queue milestone for after completion sheet dismissal
         if let milestone = result.newMilestone {
             pendingMilestone = milestone
         }
     }
 
-    private func dismissCompletion() {
-        showCompletion = false
-        guard engine.state == .completed else { return }
+    private func dismissReward() {
+        withAnimation(.easeOut(duration: 0.3)) {
+            showRewardOverlay = false
+        }
+        completionResult = nil
+        completionReflection = nil
+
         if let preset = presets.first {
-            engine.prepareNextSession(
-                sessionsBeforeLongBreak: preset.sessionsBeforeLongBreak
-            )
+            engine.prepareNextSession(sessionsBeforeLongBreak: preset.sessionsBeforeLongBreak)
             engine.acknowledge()
             engine.loadPreset(
                 focusSeconds: preset.focusDurationSeconds,
@@ -486,7 +444,6 @@ struct TimerView: View {
         }
         taskName = ""
 
-        // Show milestone after a brief delay so sheets don't conflict
         if pendingMilestone != nil {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 showMilestone = true
