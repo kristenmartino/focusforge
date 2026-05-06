@@ -71,6 +71,7 @@ struct MilestoneUnlockView: View {
                             .foregroundStyle(FFTheme.Accent.cyan)
                         }
                     }
+                    .animatedRareShimmer(if: milestone.itemRarity == .animatedRare)
                     .padding(.horizontal, FFTheme.Spacing.xxl)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
@@ -95,13 +96,7 @@ struct MilestoneUnlockView: View {
         .presentationDetents([.large])
     }
 
-    private var rarityColor: Color {
-        switch milestone.itemRarity {
-        case .common: FFTheme.Rarity.common
-        case .rare: FFTheme.Rarity.rare
-        case .animatedRare: FFTheme.Accent.gold
-        }
-    }
+    private var rarityColor: Color { milestone.itemRarity.color }
 
     private var slotIcon: String {
         switch milestone.itemSlot {

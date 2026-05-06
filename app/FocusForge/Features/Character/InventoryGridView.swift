@@ -163,6 +163,10 @@ struct InventoryGridView: View {
                         }
                     }
                 }
+                .animatedRareShimmer(
+                    if: isOwned && item.rarity == .animatedRare,
+                    cornerRadius: FFTheme.Radius.md
+                )
             Text(item.name)
                 .font(.system(size: 10))
                 .foregroundStyle(isOwned ? FFTheme.Text.primary : FFTheme.Text.secondary)
