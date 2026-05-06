@@ -64,6 +64,17 @@ enum SessionLogger {
 
         try? context.save()
 
+        AnalyticsService.track(.sessionCompleted, parameters: [
+            "phase": sessionType.rawValue,
+            "planned_minutes": Int(plannedDuration / 60),
+            "actual_minutes": Int(Date.now.timeIntervalSince(startedAt) / 60),
+            "xp_earned": totalXP,
+            "coins_earned": base.coins,
+            "streak_days": streakDays,
+            "leveled_up": leveledUp,
+            "task_named": !taskName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        ])
+
         return SessionResult(
             xp: totalXP,
             coins: base.coins,
@@ -96,6 +107,13 @@ enum SessionLogger {
         )
         context.insert(log)
         try? context.save()
+
+        AnalyticsService.track(.sessionAbandoned, parameters: [
+            "phase": sessionType.rawValue,
+            "planned_seconds": Int(plannedDuration),
+            "actual_seconds": Int(actualDuration),
+            "completion_fraction": plannedDuration > 0 ? actualDuration / plannedDuration : 0
+        ])
     }
 
     private static func calculateBaseRewards(for type: SessionPhase, duration: TimeInterval) -> (xp: Int, coins: Int) {

@@ -19,6 +19,12 @@ struct IntentFramingView: View {
 
             Text("Focus Intent")
                 .font(.title2.bold())
+                .onAppear {
+                    AnalyticsService.track(.aiPromptShown, parameters: [
+                        "kind": "intent",
+                        "template_id": framing.templateID
+                    ])
+                }
 
             VStack(spacing: 12) {
                 Text("Your task:")
@@ -58,6 +64,11 @@ struct IntentFramingView: View {
             VStack(spacing: 12) {
                 if isEditing {
                     Button("Use Edited Intent") {
+                        AnalyticsService.track(.aiSuggestionAccepted, parameters: [
+                            "kind": "intent",
+                            "edited": true,
+                            "template_id": framing.templateID
+                        ])
                         onAccept(editedText.trimmingCharacters(in: .whitespacesAndNewlines))
                     }
                     .buttonStyle(.borderedProminent)
@@ -65,6 +76,11 @@ struct IntentFramingView: View {
                     .disabled(editedText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 } else {
                     Button("Accept") {
+                        AnalyticsService.track(.aiSuggestionAccepted, parameters: [
+                            "kind": "intent",
+                            "edited": false,
+                            "template_id": framing.templateID
+                        ])
                         onAccept(framing.reframedTask)
                     }
                     .buttonStyle(.borderedProminent)
@@ -78,8 +94,14 @@ struct IntentFramingView: View {
                     .controlSize(.large)
                 }
 
-                Button("Skip", action: onSkip)
-                    .foregroundStyle(.secondary)
+                Button("Skip") {
+                    AnalyticsService.track(.aiSuggestionDismissed, parameters: [
+                        "kind": "intent",
+                        "template_id": framing.templateID
+                    ])
+                    onSkip()
+                }
+                .foregroundStyle(.secondary)
             }
 
             Spacer()

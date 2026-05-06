@@ -20,18 +20,35 @@ enum StreakManager {
             } else if daysBetween == 1 {
                 // Yesterday — extend streak
                 streakState.currentStreakDays += 1
+                AnalyticsService.track(.streakIncremented, parameters: [
+                    "streak_days": streakState.currentStreakDays
+                ])
             } else if daysBetween >= 2 && streakState.freezesAvailable > 0 {
                 // Missed day(s) but have freeze — consume one, keep streak
                 streakState.freezesAvailable -= 1
                 streakState.freezesUsed += 1
                 streakState.currentStreakDays += 1
+                AnalyticsService.track(.streakFreezeUsed, parameters: [
+                    "days_skipped": daysBetween,
+                    "streak_days": streakState.currentStreakDays,
+                    "freezes_remaining": streakState.freezesAvailable
+                ])
             } else {
                 // Streak broken — reset
+                let lostStreak = streakState.currentStreakDays
                 streakState.currentStreakDays = 1
+                AnalyticsService.track(.streakLost, parameters: [
+                    "previous_streak": lostStreak,
+                    "days_skipped": daysBetween
+                ])
             }
         } else {
             // First ever session
             streakState.currentStreakDays = 1
+            AnalyticsService.track(.streakIncremented, parameters: [
+                "streak_days": 1,
+                "first_session": true
+            ])
         }
 
         streakState.lastCompletedDate = .now

@@ -20,11 +20,21 @@ struct PostReflectionCardView: View {
                     .multilineTextAlignment(.leading)
             }
             .padding(.horizontal)
+            .onAppear {
+                AnalyticsService.track(.aiPromptShown, parameters: [
+                    "kind": "reflection",
+                    "category": reflection.category.rawValue
+                ])
+            }
 
             if !feedbackGiven {
                 HStack(spacing: 16) {
                     Button {
                         feedbackGiven = true
+                        AnalyticsService.track(.aiRecommendationFollowed, parameters: [
+                            "kind": "reflection",
+                            "category": reflection.category.rawValue
+                        ])
                         onFeedback(true)
                     } label: {
                         Label("Helpful", systemImage: "hand.thumbsup")
@@ -35,6 +45,10 @@ struct PostReflectionCardView: View {
 
                     Button {
                         feedbackGiven = true
+                        AnalyticsService.track(.aiSuggestionDismissed, parameters: [
+                            "kind": "reflection",
+                            "category": reflection.category.rawValue
+                        ])
                         onFeedback(false)
                     } label: {
                         Label("Not helpful", systemImage: "hand.thumbsdown")

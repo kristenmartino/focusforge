@@ -21,11 +21,23 @@ struct StreakRescueBannerView: View {
 
             Spacer()
 
-            Button("Start", action: onStartSession)
-                .buttonStyle(.borderedProminent)
-                .controlSize(.small)
+            Button("Start") {
+                AnalyticsService.track(.aiNudgeOpened, parameters: [
+                    "kind": "streak_rescue",
+                    "streak_days": streakDays
+                ])
+                onStartSession()
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.small)
 
-            Button(action: onDismiss) {
+            Button {
+                AnalyticsService.track(.aiSuggestionDismissed, parameters: [
+                    "kind": "streak_rescue",
+                    "streak_days": streakDays
+                ])
+                onDismiss()
+            } label: {
                 Image(systemName: "xmark")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -35,5 +47,11 @@ struct StreakRescueBannerView: View {
         .padding(.vertical, 10)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal)
+        .onAppear {
+            AnalyticsService.track(.aiPromptShown, parameters: [
+                "kind": "streak_rescue",
+                "streak_days": streakDays
+            ])
+        }
     }
 }

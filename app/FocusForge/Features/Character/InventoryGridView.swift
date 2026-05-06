@@ -45,11 +45,21 @@ struct InventoryGridView: View {
         switch item.ownership {
         case .owned, .new:
             if equippedItemID == item.itemID {
+                AnalyticsService.track(.cosmeticUnequipped, parameters: [
+                    "item_id": item.itemID,
+                    "slot": item.slot.rawValue,
+                    "rarity": item.rarity.rawValue
+                ])
                 onEquip(nil)
             } else {
                 if item.ownership == .new {
                     item.ownership = .owned
                 }
+                AnalyticsService.track(.cosmeticEquipped, parameters: [
+                    "item_id": item.itemID,
+                    "slot": item.slot.rawValue,
+                    "rarity": item.rarity.rawValue
+                ])
                 onEquip(item.itemID)
             }
         case .locked:
@@ -59,6 +69,17 @@ struct InventoryGridView: View {
                 }
                 item.ownership = .new
                 item.acquiredAt = .now
+                AnalyticsService.track(.cosmeticPurchased, parameters: [
+                    "item_id": item.itemID,
+                    "slot": item.slot.rawValue,
+                    "rarity": item.rarity.rawValue,
+                    "coin_cost": item.coinCost
+                ])
+                AnalyticsService.track(.cosmeticEquipped, parameters: [
+                    "item_id": item.itemID,
+                    "slot": item.slot.rawValue,
+                    "rarity": item.rarity.rawValue
+                ])
                 onEquip(item.itemID)
             } else {
                 onLockedTap?(item)

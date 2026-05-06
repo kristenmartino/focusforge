@@ -343,6 +343,11 @@ struct TimerView: View {
         engine.taskName = taskName
         engine.start(duration: duration, sessionType: engine.currentSessionType)
         notificationService.scheduleCompletion(in: duration, sessionType: engine.currentSessionType)
+        AnalyticsService.track(.sessionStarted, parameters: [
+            "phase": engine.currentSessionType.rawValue,
+            "planned_minutes": Int(duration / 60),
+            "task_named": !taskName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        ])
     }
 
     private func cancelSession() {

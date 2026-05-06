@@ -90,6 +90,15 @@ enum MilestoneEngine {
     }
 
     private static func grantMilestone(_ milestone: MilestoneReward, streakDays: Int, in context: ModelContext) {
+        AnalyticsService.track(.milestoneUnlocked, parameters: [
+            "milestone_id": milestone.milestoneID,
+            "streak_day": milestone.streakDay,
+            "item_id": milestone.itemID,
+            "item_slot": milestone.itemSlot.rawValue,
+            "item_rarity": milestone.itemRarity.rawValue,
+            "current_streak_days": streakDays
+        ])
+
         // Create unlock event
         let event = UnlockEvent(
             itemID: milestone.itemID,
