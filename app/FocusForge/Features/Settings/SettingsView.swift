@@ -141,6 +141,7 @@ struct SettingsView: View {
                     .listRowBackground(Color.white.opacity(0.04))
                 }
                 .scrollContentBackground(.hidden)
+                .tint(FFTheme.Accent.blue)
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)

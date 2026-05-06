@@ -10,89 +10,105 @@ struct AICoachSettingsView: View {
     }
 
     var body: some View {
-        List {
-            Section {
-                Toggle("AI Coach", isOn: Binding(
-                    get: { preference.aiCoachEnabled },
-                    set: { preference.aiCoachEnabled = $0; preference.updatedAt = .now }
-                ))
-            } footer: {
-                Text("The AI Coach provides focus tips and streak reminders. All features run on-device and are optional.")
-            }
+        ZStack {
+            FFTheme.Background.primary.ignoresSafeArea()
 
-            if preference.aiCoachEnabled {
-                Section("Features") {
-                    Toggle("Intent Framing", isOn: Binding(
-                        get: { preference.intentFramingEnabled },
-                        set: { preference.intentFramingEnabled = $0; preference.updatedAt = .now }
-                    ))
-                    Toggle("Post-Session Tips", isOn: Binding(
-                        get: { preference.postReflectionEnabled },
-                        set: { preference.postReflectionEnabled = $0; preference.updatedAt = .now }
-                    ))
-                    Toggle("Streak Nudges", isOn: Binding(
-                        get: { preference.streakNudgeEnabled },
-                        set: { preference.streakNudgeEnabled = $0; preference.updatedAt = .now }
-                    ))
-                }
-
+            List {
                 Section {
-                    Picker("Tone", selection: Binding(
-                        get: { preference.tone },
-                        set: { preference.tone = $0; preference.updatedAt = .now }
-                    )) {
-                        Text("Encouraging").tag(CoachTone.encouraging)
-                        Text("Direct").tag(CoachTone.direct)
-                        Text("Calm").tag(CoachTone.calm)
-                    }
-                    .pickerStyle(.segmented)
-                } header: {
-                    Text("Coach Tone")
+                    Toggle("AI Coach", isOn: Binding(
+                        get: { preference.aiCoachEnabled },
+                        set: { preference.aiCoachEnabled = $0; preference.updatedAt = .now }
+                    ))
                 } footer: {
-                    Text(toneDescription)
+                    Text("The AI Coach provides focus tips and streak reminders. All features run on-device and are optional.")
+                        .foregroundStyle(FFTheme.Text.tertiary)
                 }
+                .listRowBackground(Color.white.opacity(0.04))
 
-                Section {
-                    Picker("Frequency", selection: Binding(
-                        get: { preference.nudgeFrequency },
-                        set: { preference.nudgeFrequency = $0; preference.updatedAt = .now }
-                    )) {
-                        Text("Low").tag(NudgeFrequency.low)
-                        Text("Medium").tag(NudgeFrequency.medium)
-                        Text("High").tag(NudgeFrequency.high)
+                if preference.aiCoachEnabled {
+                    Section("Features") {
+                        Toggle("Intent Framing", isOn: Binding(
+                            get: { preference.intentFramingEnabled },
+                            set: { preference.intentFramingEnabled = $0; preference.updatedAt = .now }
+                        ))
+                        Toggle("Post-Session Tips", isOn: Binding(
+                            get: { preference.postReflectionEnabled },
+                            set: { preference.postReflectionEnabled = $0; preference.updatedAt = .now }
+                        ))
+                        Toggle("Streak Nudges", isOn: Binding(
+                            get: { preference.streakNudgeEnabled },
+                            set: { preference.streakNudgeEnabled = $0; preference.updatedAt = .now }
+                        ))
                     }
-                    .pickerStyle(.segmented)
-                } header: {
-                    Text("Nudge Frequency")
-                } footer: {
-                    Text(frequencyDescription)
-                }
+                    .listRowBackground(Color.white.opacity(0.04))
 
-                Section {
-                    Picker("Start", selection: Binding(
-                        get: { preference.quietHoursStart },
-                        set: { preference.quietHoursStart = $0; preference.updatedAt = .now }
-                    )) {
-                        ForEach(0..<24, id: \.self) { hour in
-                            Text(formatHour(hour)).tag(hour)
+                    Section {
+                        Picker("Tone", selection: Binding(
+                            get: { preference.tone },
+                            set: { preference.tone = $0; preference.updatedAt = .now }
+                        )) {
+                            Text("Encouraging").tag(CoachTone.encouraging)
+                            Text("Direct").tag(CoachTone.direct)
+                            Text("Calm").tag(CoachTone.calm)
                         }
+                        .pickerStyle(.segmented)
+                    } header: {
+                        Text("Coach Tone")
+                    } footer: {
+                        Text(toneDescription)
+                            .foregroundStyle(FFTheme.Text.tertiary)
                     }
-                    Picker("End", selection: Binding(
-                        get: { preference.quietHoursEnd },
-                        set: { preference.quietHoursEnd = $0; preference.updatedAt = .now }
-                    )) {
-                        ForEach(0..<24, id: \.self) { hour in
-                            Text(formatHour(hour)).tag(hour)
+                    .listRowBackground(Color.white.opacity(0.04))
+
+                    Section {
+                        Picker("Frequency", selection: Binding(
+                            get: { preference.nudgeFrequency },
+                            set: { preference.nudgeFrequency = $0; preference.updatedAt = .now }
+                        )) {
+                            Text("Low").tag(NudgeFrequency.low)
+                            Text("Medium").tag(NudgeFrequency.medium)
+                            Text("High").tag(NudgeFrequency.high)
                         }
+                        .pickerStyle(.segmented)
+                    } header: {
+                        Text("Nudge Frequency")
+                    } footer: {
+                        Text(frequencyDescription)
+                            .foregroundStyle(FFTheme.Text.tertiary)
                     }
-                } header: {
-                    Text("Quiet Hours")
-                } footer: {
-                    Text("No streak nudges will be sent during quiet hours.")
+                    .listRowBackground(Color.white.opacity(0.04))
+
+                    Section {
+                        Picker("Start", selection: Binding(
+                            get: { preference.quietHoursStart },
+                            set: { preference.quietHoursStart = $0; preference.updatedAt = .now }
+                        )) {
+                            ForEach(0..<24, id: \.self) { hour in
+                                Text(formatHour(hour)).tag(hour)
+                            }
+                        }
+                        Picker("End", selection: Binding(
+                            get: { preference.quietHoursEnd },
+                            set: { preference.quietHoursEnd = $0; preference.updatedAt = .now }
+                        )) {
+                            ForEach(0..<24, id: \.self) { hour in
+                                Text(formatHour(hour)).tag(hour)
+                            }
+                        }
+                    } header: {
+                        Text("Quiet Hours")
+                    } footer: {
+                        Text("No streak nudges will be sent during quiet hours.")
+                            .foregroundStyle(FFTheme.Text.tertiary)
+                    }
+                    .listRowBackground(Color.white.opacity(0.04))
                 }
             }
+            .scrollContentBackground(.hidden)
+            .tint(FFTheme.Accent.blue)
         }
         .navigationTitle("AI Coach")
+        .darkNavigationAppearance()
     }
 
     private var toneDescription: String {
