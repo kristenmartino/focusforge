@@ -8,6 +8,16 @@ struct QuestRowView: View {
         min(quest.currentCount, quest.targetCount)
     }
 
+    /// Display progress for the bar: clamps tiny progress (1/50 = 2%) to a
+    /// minimum visible 8% fill so the bar reads as "started" rather than
+    /// "empty". The numeric label still shows the exact count.
+    private var visualProgress: Double {
+        guard quest.targetCount > 0 else { return 0 }
+        let actual = Double(progressClamped) / Double(quest.targetCount)
+        if actual <= 0 { return 0 }
+        return max(0.08, actual)
+    }
+
     private var stateDescription: String {
         if quest.isClaimed { return "Claimed" }
         if quest.isCompleted { return "Ready to claim" }
@@ -49,12 +59,9 @@ struct QuestRowView: View {
             }
 
             if !quest.isClaimed {
-                ProgressView(
-                    value: Double(progressClamped),
-                    total: Double(quest.targetCount)
-                )
-                .tint(quest.isCompleted ? FFTheme.Accent.green : FFTheme.Accent.blue)
-                .accessibilityHidden(true)
+                ProgressView(value: visualProgress, total: 1.0)
+                    .tint(quest.isCompleted ? FFTheme.Accent.green : FFTheme.Accent.blue)
+                    .accessibilityHidden(true)
             }
 
             HStack(spacing: FFTheme.Spacing.sm) {

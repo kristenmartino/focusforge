@@ -36,6 +36,9 @@ struct WeeklyStatsView: View {
     var body: some View {
         let totalMinutes = last7Days.reduce(0) { $0 + $1.minutes }
         let avgMinutes = last7Days.isEmpty ? 0 : totalMinutes / last7Days.count
+        // Show "<1" for fractional averages so first-week users with 1m
+        // of focus don't see a discouraging "0 daily avg" stat.
+        let avgDisplayLabel = (totalMinutes > 0 && avgMinutes == 0) ? "<1" : "\(avgMinutes)"
 
         return ScrollView {
             VStack(spacing: FFTheme.Spacing.lg) {
@@ -92,7 +95,7 @@ struct WeeklyStatsView: View {
                     .accessibilityElement(children: .combine)
                     .accessibilityLabel("Total: \(totalMinutes) minutes this week")
                     VStack(spacing: 4) {
-                        Text("\(avgMinutes)")
+                        Text(avgDisplayLabel)
                             .font(.statNumber)
                             .foregroundStyle(FFTheme.Text.primary)
                         Text("Daily avg")
@@ -100,7 +103,9 @@ struct WeeklyStatsView: View {
                             .foregroundStyle(FFTheme.Text.tertiary)
                     }
                     .accessibilityElement(children: .combine)
-                    .accessibilityLabel("Daily average: \(avgMinutes) minutes")
+                    .accessibilityLabel(avgMinutes == 0 && totalMinutes > 0
+                                        ? "Daily average: less than one minute"
+                                        : "Daily average: \(avgMinutes) minutes")
                 }
             }
         }

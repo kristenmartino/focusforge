@@ -14,6 +14,13 @@ struct TodayStatsView: View {
         }
     }
 
+    private var avgSessionLabel: String {
+        guard !todayCompleted.isEmpty else { return "—" }
+        let totalSeconds = todayCompleted.reduce(0) { $0 + $1.actualDurationSeconds }
+        let avgMinutes = totalSeconds / 60 / todayCompleted.count
+        return "\(avgMinutes)m"
+    }
+
     private let columns = [GridItem(.flexible()), GridItem(.flexible())]
 
     var body: some View {
@@ -48,6 +55,12 @@ struct TodayStatsView: View {
                     value: "\(todayCompleted.reduce(0) { $0 + $1.coinsEarned })",
                     icon: "circle.fill",
                     color: FFTheme.Accent.orange
+                )
+                StatCardView(
+                    title: "Avg Session",
+                    value: avgSessionLabel,
+                    icon: "stopwatch.fill",
+                    color: FFTheme.Accent.cyan
                 )
             }
             .padding()
