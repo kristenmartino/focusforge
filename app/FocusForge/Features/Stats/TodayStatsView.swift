@@ -44,14 +44,20 @@ struct TodayStatsView: View {
                     icon: "flame.fill",
                     color: FFTheme.Accent.orange
                 )
+                // Session-scoped XP/coins ONLY — does not include quest claim rewards.
+                // Quest XP/coins flow into StreakState.totalXP/totalCoins, which is
+                // what "Total XP" and "Total Coins" surface on the All Time view.
+                // The "Session" label makes the distinction explicit so the user
+                // doesn't see a mismatch between today's "XP Earned" (1) and the
+                // All Time "Total XP" (11) and wonder where the gap came from.
                 StatCardView(
-                    title: "XP Earned",
+                    title: "Session XP",
                     value: "\(todayCompleted.reduce(0) { $0 + $1.xpEarned })",
                     icon: "star.fill",
                     color: FFTheme.Accent.gold
                 )
                 StatCardView(
-                    title: "Coins Earned",
+                    title: "Session Coins",
                     value: "\(todayCompleted.reduce(0) { $0 + $1.coinsEarned })",
                     icon: "circle.fill",
                     color: FFTheme.Accent.orange
