@@ -147,15 +147,8 @@ struct SettingsView: View {
                 .scrollContentBackground(.hidden)
                 .tint(FFTheme.Accent.blue)
             }
-            .navigationTitle("")
+            .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Text("Settings")
-                        .font(.headline)
-                        .foregroundStyle(FFTheme.Text.primary)
-                }
-            }
             .darkNavigationAppearance()
         }
     }

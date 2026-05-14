@@ -22,15 +22,8 @@ struct CharacterView: View {
                     }
                 }
             }
-            .navigationTitle("")
+            .navigationTitle("Character")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Text("Character")
-                        .font(.headline)
-                        .foregroundStyle(FFTheme.Text.primary)
-                }
-            }
             .darkNavigationAppearance()
         }
     }

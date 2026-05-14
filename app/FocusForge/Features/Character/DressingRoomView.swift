@@ -112,39 +112,41 @@ struct DressingRoomView: View {
                 .tracking(1)
                 .accessibilityAddTraits(.isHeader)
 
-            HStack(spacing: 10) {
-                ForEach(colors, id: \.hex) { color in
-                    Button {
-                        selectedHex.wrappedValue = color.hex
-                    } label: {
-                        Circle()
-                            .fill(Color(hex: color.hex))
-                            .frame(width: 30, height: 30)
-                            .overlay(
-                                Circle()
-                                    .stroke(
-                                        selectedHex.wrappedValue == color.hex
-                                            ? Color.white.opacity(0.7)
-                                            : Color.clear,
-                                        lineWidth: 2
-                                    )
-                            )
-                            .overlay(
-                                Circle()
-                                    .stroke(FFTheme.Background.primary, lineWidth: 1.5)
-                                    .padding(1)
-                                    .opacity(selectedHex.wrappedValue == color.hex ? 1 : 0)
-                            )
-                            .frame(minWidth: 44, minHeight: 44)
-                            .contentShape(Circle())
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(colors, id: \.hex) { color in
+                        Button {
+                            selectedHex.wrappedValue = color.hex
+                        } label: {
+                            Circle()
+                                .fill(Color(hex: color.hex))
+                                .frame(width: 30, height: 30)
+                                .overlay(
+                                    Circle()
+                                        .stroke(
+                                            selectedHex.wrappedValue == color.hex
+                                                ? Color.white.opacity(0.7)
+                                                : Color.clear,
+                                            lineWidth: 2
+                                        )
+                                )
+                                .overlay(
+                                    Circle()
+                                        .stroke(FFTheme.Background.primary, lineWidth: 1.5)
+                                        .padding(1)
+                                        .opacity(selectedHex.wrappedValue == color.hex ? 1 : 0)
+                                )
+                                .frame(minWidth: 44, minHeight: 44)
+                                .contentShape(Circle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(
+                            "\(color.name) \(label)"
+                        )
+                        .accessibilityAddTraits(
+                            selectedHex.wrappedValue == color.hex ? .isSelected : []
+                        )
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(
-                        "\(color.name) \(label)"
-                    )
-                    .accessibilityAddTraits(
-                        selectedHex.wrappedValue == color.hex ? .isSelected : []
-                    )
                 }
             }
         }

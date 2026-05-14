@@ -58,15 +58,10 @@ struct TimerView: View {
                     .zIndex(10)
                 }
             }
-            .navigationTitle("")
+            .navigationTitle(showRewardOverlay ? "" : "Timer")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 if !showRewardOverlay {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Text("Timer")
-                            .font(.headline)
-                            .foregroundStyle(FFTheme.Text.primary)
-                    }
                     ToolbarItem(placement: .topBarTrailing) {
                         NavigationLink {
                             SessionHistoryView()

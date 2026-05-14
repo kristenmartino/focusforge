@@ -63,15 +63,8 @@ struct QuestListView: View {
                     }
                 }
             }
-            .navigationTitle("")
+            .navigationTitle("Quests")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Text("Quests")
-                        .font(.headline)
-                        .foregroundStyle(FFTheme.Text.primary)
-                }
-            }
             .darkNavigationAppearance()
         }
     }

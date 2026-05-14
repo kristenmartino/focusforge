@@ -9,8 +9,11 @@ struct IntentFramingView: View {
     @State private var isEditing = false
 
     var body: some View {
-        VStack(spacing: 20) {
-            Spacer()
+        ZStack {
+            FFTheme.Background.primary.ignoresSafeArea()
+
+            VStack(spacing: 20) {
+                Spacer()
 
             Image(systemName: "brain.head.profile")
                 .font(.system(size: 48))
@@ -104,9 +107,11 @@ struct IntentFramingView: View {
                 .foregroundStyle(.secondary)
             }
 
-            Spacer()
+                Spacer()
+            }
+            .padding()
         }
-        .padding()
         .presentationDetents([.medium])
+        .presentationBackground(FFTheme.Background.primary)
     }
 }

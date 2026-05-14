@@ -31,14 +31,9 @@ struct StatsView: View {
                     }
                 }
             }
-            .navigationTitle("")
+            .navigationTitle("Stats")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Text("Stats")
-                        .font(.headline)
-                        .foregroundStyle(FFTheme.Text.primary)
-                }
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink {
                         MilestoneTrackerView()
