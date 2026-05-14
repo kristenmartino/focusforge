@@ -35,7 +35,7 @@ struct CharacterSelectionStepView: View {
                         .foregroundStyle(FFTheme.Text.tertiary)
                 }
 
-                HStack(spacing: FFTheme.Spacing.md) {
+                HStack(spacing: FFTheme.Spacing.sm) {
                     ForEach(presets) { preset in
                         Button {
                             selectedID = preset.id
@@ -43,9 +43,9 @@ struct CharacterSelectionStepView: View {
                             VStack(spacing: FFTheme.Spacing.xs) {
                                 CharacterSpriteView(
                                     loadout: CharacterCatalog.createLoadout(from: preset),
-                                    size: 80
+                                    size: 110
                                 )
-                                .frame(width: 90, height: 90)
+                                .frame(width: 110, height: 110)
                                 .background(
                                     RoundedRectangle(cornerRadius: FFTheme.Radius.lg)
                                         .fill(
@@ -65,16 +65,21 @@ struct CharacterSelectionStepView: View {
                                 )
 
                                 Text(preset.name)
-                                    .font(.caption)
+                                    .font(.subheadline.weight(.semibold))
                                     .foregroundStyle(
                                         selectedID == preset.id
                                             ? FFTheme.Text.primary
-                                            : FFTheme.Text.tertiary
+                                            : FFTheme.Text.secondary
                                     )
+
+                                Text(preset.personality)
+                                    .font(.caption2)
+                                    .foregroundStyle(FFTheme.Text.tertiary)
+                                    .lineLimit(1)
                             }
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel("\(preset.name) character")
+                        .accessibilityLabel("\(preset.name) character — \(preset.personality)")
                         .accessibilityAddTraits(selectedID == preset.id ? .isSelected : [])
                     }
                 }

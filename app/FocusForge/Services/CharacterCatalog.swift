@@ -39,6 +39,7 @@ enum CharacterCatalog {
     struct CharacterPreset: Identifiable {
         let id: String
         let name: String
+        let personality: String
         let headShape: String
         let hairStyle: String
         let eyeStyle: String
@@ -50,19 +51,19 @@ enum CharacterCatalog {
 
     static let presets: [CharacterPreset] = [
         CharacterPreset(
-            id: "spark", name: "Spark",
+            id: "spark", name: "Spark", personality: "Cheerful, eager",
             headShape: "head1", hairStyle: "hair1",
             eyeStyle: "eyes1", mouthStyle: "mouth1",
             skinColorHex: "#E8B894", hairColorHex: "#5B7FFF", bodyColorHex: "#2980B9"
         ),
         CharacterPreset(
-            id: "ember", name: "Ember",
+            id: "ember", name: "Ember", personality: "Determined, fierce",
             headShape: "head2", hairStyle: "hair2",
             eyeStyle: "eyes3", mouthStyle: "mouth3",
             skinColorHex: "#C68642", hairColorHex: "#B33030", bodyColorHex: "#C0392B"
         ),
         CharacterPreset(
-            id: "sage", name: "Sage",
+            id: "sage", name: "Sage", personality: "Calm, wise",
             headShape: "head3", hairStyle: "hair3",
             eyeStyle: "eyes5", mouthStyle: "mouth5",
             skinColorHex: "#F5D6C3", hairColorHex: "#27AE60", bodyColorHex: "#27AE60"

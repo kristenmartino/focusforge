@@ -31,8 +31,11 @@ struct OnboardingContainerView: View {
                 .tag(1)
                 NotificationPermissionStepView(onContinue: { advance(to: 3) })
                     .tag(2)
-                FirstSessionNudgeView(onComplete: completeOnboarding)
-                    .tag(3)
+                FirstSessionNudgeView(
+                    selectedCharacterID: selectedCharacterID,
+                    onComplete: completeOnboarding
+                )
+                .tag(3)
             }
             .tabViewStyle(.page(indexDisplayMode: .always))
             .indexViewStyle(.page(backgroundDisplayMode: .always))

@@ -10,6 +10,7 @@ struct TimerView: View {
     @Query(filter: #Predicate<TimerPreset> { $0.isDefault == true })
     private var presets: [TimerPreset]
     @Query private var coachPreferences: [AICoachPreference]
+    @Query private var loadouts: [CharacterLoadout]
 
     @State private var taskName: String = ""
     @State private var showRewardOverlay = false
@@ -119,6 +120,19 @@ struct TimerView: View {
     private var timerContent: some View {
         VStack(spacing: 0) {
             Spacer()
+
+            // Tiny character silhouette in idle state — per art-direction-style-guide §5.1
+            // ("Character presence: None during active session. Optional: tiny silhouette in
+            // streak badge.") We make it not-optional: the character anchors the positioning
+            // ("your focus grows your character") even on the timer screen. Hidden during
+            // active session to preserve focus mode restraint.
+            if engine.state == .idle, let loadout = loadouts.first {
+                CharacterSpriteView(loadout: loadout, size: 64)
+                    .frame(height: 64)
+                    .padding(.bottom, FFTheme.Spacing.xs)
+                    .transition(.opacity)
+                    .accessibilityLabel("Your character")
+            }
 
             StreakBadgeView()
                 .padding(.bottom, FFTheme.Spacing.sm)
