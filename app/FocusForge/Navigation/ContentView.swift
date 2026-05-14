@@ -13,8 +13,18 @@ struct ContentView: View {
     @State private var showRescueBanner = false
     @State private var bannerDismissed = false
 
+    /// P1-16: debug-only override so the streak rescue banner is testable
+    /// without engineering specific BehaviorSignalComputer conditions.
+    /// Toggled from SettingsView's Debug section.
+    @AppStorage("debug.forceStreakRescueBanner") private var debugForceStreakRescueBanner = false
+
     private var shouldShowBanner: Bool {
         guard !bannerDismissed else { return false }
+        #if DEBUG
+        if debugForceStreakRescueBanner {
+            return (streakStates.first?.currentStreakDays ?? 0) > 0
+        }
+        #endif
         guard let pref = coachPreferences.first,
               pref.aiCoachEnabled && pref.streakNudgeEnabled else { return false }
         guard let streak = streakStates.first,

@@ -1,7 +1,7 @@
 import Foundation
 import SwiftData
 
-struct MilestoneReward {
+struct MilestoneReward: Identifiable {
     let milestoneID: String
     let name: String
     let streakDay: Int
@@ -10,6 +10,8 @@ struct MilestoneReward {
     let itemSlot: ItemSlot
     let itemRarity: ItemRarity
     let freezeGranted: Int
+
+    var id: String { milestoneID }
 }
 
 enum MilestoneEngine {

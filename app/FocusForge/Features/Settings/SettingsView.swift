@@ -7,6 +7,8 @@ struct SettingsView: View {
     @Query private var streakStates: [StreakState]
     @Environment(\.modelContext) private var modelContext
     @State private var debugSignalText: String = ""
+    @State private var debugMilestonePreview: MilestoneReward?
+    @AppStorage("debug.forceStreakRescueBanner") private var debugForceStreakRescueBanner = false
 
     private var preset: TimerPreset? { presets.first }
     private var streakState: StreakState? { streakStates.first }
@@ -135,6 +137,20 @@ struct SettingsView: View {
                                 .font(.caption2)
                                 .foregroundStyle(FFTheme.Text.tertiary)
                         }
+
+                        // P1-15: present MilestoneUnlockView directly so the
+                        // celebration UI is testable without simulating multi-day
+                        // streak progression.
+                        ForEach(MilestoneEngine.milestones) { milestone in
+                            Button("Preview Day \(milestone.streakDay) Milestone — \(milestone.name)") {
+                                debugMilestonePreview = milestone
+                            }
+                        }
+
+                        // P1-16: force the streak rescue banner regardless of
+                        // BehaviorSignalComputer's time-of-day-dependent score.
+                        // Read by ContentView via the same @AppStorage key.
+                        Toggle("Force Streak Rescue Banner", isOn: $debugForceStreakRescueBanner)
                     }
                     .listRowBackground(Color.white.opacity(0.04))
                     #endif
@@ -150,6 +166,12 @@ struct SettingsView: View {
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .darkNavigationAppearance()
+            .sheet(item: $debugMilestonePreview) { milestone in
+                MilestoneUnlockView(milestone: milestone) {
+                    debugMilestonePreview = nil
+                }
+                .presentationBackground(Color.clear)
+            }
         }
     }
 
