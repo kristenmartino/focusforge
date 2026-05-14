@@ -31,7 +31,7 @@ struct FirstSessionNudgeView: View {
                         .font(.title2.bold())
                         .foregroundStyle(FFTheme.Text.primary)
 
-                    Text("Start your first focus session\nand begin building your streak.")
+                    Text("Start your first focus session\nand begin building your character.")
                         .font(.body)
                         .foregroundStyle(FFTheme.Text.secondary)
                         .multilineTextAlignment(.center)

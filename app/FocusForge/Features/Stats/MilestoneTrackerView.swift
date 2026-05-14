@@ -80,7 +80,7 @@ struct MilestoneRowView: View {
                     }
                     .foregroundStyle(FFTheme.Text.secondary)
 
-                    Text(milestone.itemRarity.rawValue.capitalized)
+                    Text(milestone.itemRarity.displayName)
                         .font(.caption2.weight(.semibold))
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)

@@ -52,7 +52,7 @@ struct MilestoneUnlockView: View {
                                         .font(.body.weight(.medium))
                                         .foregroundStyle(FFTheme.Text.primary)
 
-                                    Text(milestone.itemRarity.rawValue.capitalized)
+                                    Text(milestone.itemRarity.displayName)
                                         .font(.caption.weight(.semibold))
                                         .foregroundStyle(rarityColor)
                                         .padding(.horizontal, 8)

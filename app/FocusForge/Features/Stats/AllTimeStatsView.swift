@@ -30,7 +30,7 @@ struct AllTimeStatsView: View {
                 )
                 StatCardView(
                     title: "Longest Streak",
-                    value: "\(streak?.longestStreakDays ?? 0) days",
+                    value: (streak?.longestStreakDays ?? 0).pluralized("day"),
                     icon: "flame.fill",
                     color: FFTheme.Accent.orange
                 )

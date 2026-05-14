@@ -33,7 +33,7 @@ struct TodayStatsView: View {
                 )
                 StatCardView(
                     title: "Streak",
-                    value: "\(streakStates.first?.currentStreakDays ?? 0) days",
+                    value: (streakStates.first?.currentStreakDays ?? 0).pluralized("day"),
                     icon: "flame.fill",
                     color: FFTheme.Accent.orange
                 )

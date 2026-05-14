@@ -32,7 +32,7 @@ struct WelcomeStepView: View {
                         .font(.largeTitle.bold())
                         .foregroundStyle(FFTheme.Text.primary)
 
-                    Text("Build focus habits with timers, streaks,\nand character progression.")
+                    Text("Your focus grows your character.")
                         .font(.body)
                         .foregroundStyle(FFTheme.Text.secondary)
                         .multilineTextAlignment(.center)

@@ -10,4 +10,14 @@ extension ItemRarity {
         case .animatedRare: FFTheme.Rarity.animatedRare
         }
     }
+
+    /// Human-readable rarity name. Used in rarity capsules and milestone reveals.
+    /// Avoids `.rawValue.capitalized` which butchers camelCase ("animatedRare" → "Animatedrare").
+    var displayName: String {
+        switch self {
+        case .common: "Common"
+        case .rare: "Rare"
+        case .animatedRare: "Animated Rare"
+        }
+    }
 }

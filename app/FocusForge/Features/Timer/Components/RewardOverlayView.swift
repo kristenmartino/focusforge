@@ -78,7 +78,7 @@ struct RewardOverlayView: View {
                             .font(.rewardHeadline)
                             .foregroundStyle(FFTheme.Text.primary)
 
-                        Text("\(Int(duration / 60)) minutes")
+                        Text(Int(duration / 60).pluralized("minute"))
                             .font(.rewardSubhead)
                             .foregroundStyle(FFTheme.Text.tertiary)
                     }
@@ -92,7 +92,7 @@ struct RewardOverlayView: View {
                             Image(systemName: "flame.fill")
                                 .foregroundStyle(FFTheme.Accent.orange)
                                 .accessibilityHidden(true)
-                            Text("Day \(result.streakDays) streak!")
+                            Text("\(result.streakDays.pluralized("day")) streak!")
                                 .foregroundStyle(FFTheme.Accent.orange)
                         }
                         .font(.subheadline.weight(.semibold))
