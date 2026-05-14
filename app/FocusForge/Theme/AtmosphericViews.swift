@@ -45,28 +45,42 @@ struct RewardBackground: View {
             )
             .ignoresSafeArea()
 
-            // Primary purple glow
+            // Primary purple glow — top-center, larger to cover more of the screen
+            // per art-direction-style-guide §5.2 "purple primary rgba(180,120,255,0.15)"
             RadialGradient(
                 colors: [
-                    Color(hex: "#B478FF").opacity(0.12),
-                    Color(hex: "#8C64DC").opacity(0.04),
+                    Color(hex: "#B478FF").opacity(0.18),
+                    Color(hex: "#8C64DC").opacity(0.08),
                     Color.clear,
                 ],
-                center: UnitPoint(x: 0.5, y: 0.3),
+                center: UnitPoint(x: 0.5, y: 0.25),
                 startRadius: 0,
-                endRadius: 200
+                endRadius: 400
             )
             .ignoresSafeArea()
 
-            // Secondary warm glow (lower left)
+            // Secondary warm glow — lower-left, larger radius
+            // per art-direction-style-guide §5.2 "warm secondary rgba(255,180,60,0.05)"
             RadialGradient(
                 colors: [
-                    FFTheme.Accent.orange.opacity(0.06),
+                    FFTheme.Accent.orange.opacity(0.08),
                     Color.clear,
                 ],
-                center: UnitPoint(x: 0.35, y: 0.75),
+                center: UnitPoint(x: 0.30, y: 0.72),
                 startRadius: 0,
-                endRadius: 100
+                endRadius: 240
+            )
+            .ignoresSafeArea()
+
+            // Tertiary purple glow — bottom-right, adds depth without busyness
+            RadialGradient(
+                colors: [
+                    Color(hex: "#7B5FD4").opacity(0.10),
+                    Color.clear,
+                ],
+                center: UnitPoint(x: 0.78, y: 0.88),
+                startRadius: 0,
+                endRadius: 280
             )
             .ignoresSafeArea()
         }

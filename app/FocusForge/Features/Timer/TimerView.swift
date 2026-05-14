@@ -60,6 +60,7 @@ struct TimerView: View {
             }
             .navigationTitle(showRewardOverlay ? "" : "Timer")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar(showRewardOverlay ? .hidden : .visible, for: .tabBar)
             .toolbar {
                 if !showRewardOverlay {
                     ToolbarItem(placement: .topBarTrailing) {
