@@ -9,6 +9,9 @@ struct SettingsView: View {
     @State private var debugSignalText: String = ""
     @State private var debugMilestonePreview: MilestoneReward?
     @AppStorage("debug.forceStreakRescueBanner") private var debugForceStreakRescueBanner = false
+    @State private var showBackupShare = false
+    @State private var backupShareItems: [Any] = []
+    @State private var backupError: String?
 
     private var preset: TimerPreset? { presets.first }
     private var streakState: StreakState? { streakStates.first }
@@ -78,6 +81,26 @@ struct SettingsView: View {
                         } label: {
                             Label("AI Coach Settings", systemImage: "brain.head.profile")
                         }
+                    }
+                    .listRowBackground(Color.white.opacity(0.04))
+
+                    Section {
+                        Button {
+                            exportBackup()
+                        } label: {
+                            Label("Export My Progress", systemImage: "square.and.arrow.up")
+                                .foregroundStyle(FFTheme.Accent.blue)
+                        }
+                        if let backupError {
+                            Text(backupError)
+                                .font(.caption)
+                                .foregroundStyle(FFTheme.Accent.red)
+                        }
+                    } header: {
+                        Text("Backup")
+                    } footer: {
+                        Text("Save a JSON snapshot of your streak, character, inventory, sessions, and quests. Useful before upgrading your phone or wiping data. CloudKit sync arrives in v1.1.")
+                            .foregroundStyle(FFTheme.Text.tertiary)
                     }
                     .listRowBackground(Color.white.opacity(0.04))
 
@@ -172,6 +195,28 @@ struct SettingsView: View {
                 }
                 .presentationBackground(Color.clear)
             }
+            .sheet(isPresented: $showBackupShare) {
+                ShareSheet(items: backupShareItems)
+            }
+        }
+    }
+
+    // MARK: - Backup
+
+    /// Generates a JSON backup of the user's progress and presents the system
+    /// share sheet. Writes to the temporary directory so the share-sheet target
+    /// (Files, Mail, AirDrop, etc.) sees a real file with a sensible filename.
+    private func exportBackup() {
+        backupError = nil
+        do {
+            let data = try DataExportService.exportJSON(in: modelContext)
+            let url = FileManager.default.temporaryDirectory
+                .appendingPathComponent(DataExportService.defaultFilename())
+            try data.write(to: url, options: .atomic)
+            backupShareItems = [url]
+            showBackupShare = true
+        } catch {
+            backupError = "Couldn't generate backup: \(error.localizedDescription)"
         }
     }
 
