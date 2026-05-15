@@ -86,13 +86,33 @@ targets:
       properties:
         com.apple.developer.icloud-container-identifiers: []
 
+  FocusForgeTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: FocusForgeTests
+    dependencies:
+      - target: FocusForge
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.focusforge.app.tests
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/FocusForge.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FocusForge"
+        GENERATE_INFOPLIST_FILE: "YES"
+
 schemes:
   FocusForge:
     build:
       targets:
         FocusForge: all
+        FocusForgeTests: [test]
     run:
       config: Debug
+    test:
+      config: Debug
+      targets:
+        - FocusForgeTests
     profile:
       config: Release
     analyze:
