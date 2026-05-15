@@ -40,11 +40,11 @@ struct SettingsView: View {
                             )
                             .accessibilityValue("\(preset.longBreakDurationSeconds / 60) minutes")
                             Stepper(
-                                "Sessions before long break: \(preset.sessionsBeforeLongBreak)",
+                                "Long break every: \(preset.sessionsBeforeLongBreak)",
                                 value: sessionsBinding(preset),
                                 in: 1...10
                             )
-                            .accessibilityValue("\(preset.sessionsBeforeLongBreak)")
+                            .accessibilityValue("\(preset.sessionsBeforeLongBreak) sessions")
                         }
                         .listRowBackground(Color.white.opacity(0.04))
                     }

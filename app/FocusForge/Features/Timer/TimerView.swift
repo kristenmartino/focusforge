@@ -23,6 +23,18 @@ struct TimerView: View {
 
     private let ringSize: CGFloat = 260
 
+    /// Maps the timer engine's state to the ring's visual intensity tier.
+    /// .idle/.completed read as "ready/done" (softer); .running pushes the
+    /// aura wider for a "breathing" presence; .paused dims both rings so
+    /// the screen reads as frozen mid-session. (P2-3 / P2-4)
+    private var ringVisualState: GlowProgressRingView.VisualState {
+        switch engine.state {
+        case .running: return .running
+        case .paused:  return .paused
+        default:       return .idle
+        }
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -147,21 +159,36 @@ struct TimerView: View {
                 GlowProgressRingView(
                     progress: engine.progress,
                     sessionType: engine.currentSessionType,
+                    state: ringVisualState,
                     size: ringSize
                 )
 
-                Text(engine.formattedTime)
-                    .font(.timerDisplay)
-                    .foregroundStyle(FFTheme.Text.primary)
-                    .monospacedDigit()
-                    .contentTransition(.numericText())
-                    .accessibilityLabel(
-                        "Time remaining: \(engine.accessibleTimeDescription)"
-                    )
+                VStack(spacing: FFTheme.Spacing.xxs) {
+                    Text(engine.formattedTime)
+                        .font(.timerDisplay)
+                        .foregroundStyle(FFTheme.Text.primary)
+                        .monospacedDigit()
+                        .contentTransition(.numericText())
+                        .accessibilityLabel(
+                            "Time remaining: \(engine.accessibleTimeDescription)"
+                        )
+
+                    if case .paused = engine.state {
+                        Text("PAUSED")
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(FFTheme.Text.secondary)
+                            .tracking(2)
+                            .transition(.opacity)
+                            .accessibilityHidden(true)
+                    }
+                }
             }
             .padding(.bottom, FFTheme.Spacing.lg)
+            .animation(.easeInOut(duration: 0.2), value: engine.state)
 
-            if engine.state == .idle {
+            // Task name input only makes sense for focus phases — during a break
+            // the user isn't "working on" anything (P2-7).
+            if engine.state == .idle && engine.currentSessionType == .focus {
                 taskNameField
             } else if !taskName.isEmpty {
                 Text(taskName)

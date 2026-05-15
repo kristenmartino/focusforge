@@ -22,7 +22,15 @@ struct MilestoneTrackerView: View {
                         currentStreak: currentStreak,
                         isEarned: isEarned(milestone)
                     )
-                    .listRowBackground(Color.white.opacity(0.04))
+                    // Subtle rarity-tinted row backgrounds for depth (P2-14).
+                    // Common keeps the neutral white-overlay; Rare and Animated
+                    // Rare get a faint rarity-color wash so the list reads as a
+                    // ladder of tiers rather than five identical rows.
+                    .listRowBackground(
+                        milestone.itemRarity == .common
+                            ? Color.white.opacity(0.04)
+                            : milestone.itemRarity.color.opacity(0.06)
+                    )
                 }
             }
             .scrollContentBackground(.hidden)
@@ -63,11 +71,14 @@ struct MilestoneRowView: View {
                     .foregroundStyle(FFTheme.Text.tertiary)
 
                 if !isEarned {
-                    ProgressView(
-                        value: Double(min(currentStreak, milestone.streakDay)),
-                        total: Double(milestone.streakDay)
-                    )
-                    .tint(rarityColor)
+                    // Clamp tiny progress to a minimum visible 8% so users with
+                    // 1 of 7 days don't see an empty bar — mirrors P1-13 fix
+                    // on QuestRowView (P2-13).
+                    let actual = min(currentStreak, milestone.streakDay)
+                    let fraction = Double(actual) / Double(milestone.streakDay)
+                    let visualFraction = actual > 0 ? max(0.08, fraction) : 0
+                    ProgressView(value: visualFraction, total: 1.0)
+                        .tint(rarityColor)
                 }
 
                 HStack(spacing: FFTheme.Spacing.xs) {

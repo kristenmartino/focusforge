@@ -9,12 +9,41 @@ import SwiftUI
 struct GlowProgressRingView: View {
     let progress: Double
     let sessionType: SessionPhase
+    /// Visual intensity. `.idle` reads as "ready"; `.running` pushes the glow
+    /// aura wider; `.paused` softens both rings so the screen reads as
+    /// "frozen mid-session" without changing layout. (P2-3 / P2-4)
+    var state: VisualState = .running
     var size: CGFloat = 260
     var lineWidth: CGFloat = 3
     var glowWidth: CGFloat = 8
 
+    enum VisualState {
+        case idle, running, paused
+    }
+
     private var ringColor: Color {
         FFTheme.sessionColor(for: sessionType)
+    }
+
+    private var auraOpacity: Double {
+        switch state {
+        case .idle:    return 0.12
+        case .running: return 0.24
+        case .paused:  return 0.10
+        }
+    }
+
+    private var crispOpacity: Double {
+        switch state {
+        case .idle:    return 0.70
+        case .running: return 0.95
+        case .paused:  return 0.50
+        }
+    }
+
+    private var auraGlowWidth: CGFloat {
+        // Push the glow wider in the active state for a "breathing" presence.
+        state == .running ? glowWidth + 2 : glowWidth
     }
 
     var body: some View {
@@ -30,8 +59,8 @@ struct GlowProgressRingView: View {
             Circle()
                 .trim(from: 0, to: progress)
                 .stroke(
-                    ringColor.opacity(0.15),
-                    style: StrokeStyle(lineWidth: glowWidth, lineCap: .round)
+                    ringColor.opacity(auraOpacity),
+                    style: StrokeStyle(lineWidth: auraGlowWidth, lineCap: .round)
                 )
                 .rotationEffect(.degrees(-90))
 
@@ -39,13 +68,14 @@ struct GlowProgressRingView: View {
             Circle()
                 .trim(from: 0, to: progress)
                 .stroke(
-                    ringColor.opacity(0.90),
+                    ringColor.opacity(crispOpacity),
                     style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
                 )
                 .rotationEffect(.degrees(-90))
         }
         .frame(width: size, height: size)
         .animation(.linear(duration: 0.1), value: progress)
+        .animation(.easeInOut(duration: 0.25), value: auraOpacity)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Timer progress")
         .accessibilityValue("\(Int(progress * 100)) percent remaining")

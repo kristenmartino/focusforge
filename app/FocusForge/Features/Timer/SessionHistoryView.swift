@@ -74,7 +74,8 @@ private struct SessionRowView: View {
                 Text(session.taskName.isEmpty ? sessionTypeLabel : session.taskName)
                     .font(.body)
                     .foregroundStyle(FFTheme.Text.primary)
-                Text(durationLabel)
+                // Time-of-day · duration so older sessions are anchored in time (P2-9)
+                Text("\(timeOfDayLabel) · \(durationLabel)")
                     .font(.caption)
                     .foregroundStyle(FFTheme.Text.tertiary)
             }
@@ -120,6 +121,10 @@ private struct SessionRowView: View {
             return "\(minutes)m \(seconds)s"
         }
         return "\(seconds)s"
+    }
+
+    private var timeOfDayLabel: String {
+        session.startedAt.formatted(date: .omitted, time: .shortened)
     }
 
     private var outcomeIcon: String {

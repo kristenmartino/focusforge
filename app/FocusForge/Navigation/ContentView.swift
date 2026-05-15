@@ -18,6 +18,11 @@ struct ContentView: View {
     /// Toggled from SettingsView's Debug section.
     @AppStorage("debug.forceStreakRescueBanner") private var debugForceStreakRescueBanner = false
 
+    /// P2-6: cross-view deep link target. RewardOverlayView writes "quests"
+    /// when the user taps the "Claim in the Quests tab" link; this view
+    /// switches the selected tab and clears the flag.
+    @AppStorage("pendingDeepLink") private var pendingDeepLink: String = ""
+
     private var shouldShowBanner: Bool {
         guard !bannerDismissed else { return false }
         #if DEBUG
@@ -88,6 +93,26 @@ struct ContentView: View {
         }
         .animation(reduceMotion ? .none : .easeInOut(duration: 0.3), value: shouldShowBanner)
         .preferredColorScheme(.dark)
+        .onChange(of: pendingDeepLink) { _, newValue in
+            // P2-6: act on any pending deep link, then clear so it doesn't refire.
+            switch newValue {
+            case "quests":
+                selectedTab = 2
+            case "character":
+                selectedTab = 1
+            case "stats":
+                selectedTab = 3
+            case "settings":
+                selectedTab = 4
+            case "timer":
+                selectedTab = 0
+            default:
+                break
+            }
+            if !newValue.isEmpty {
+                pendingDeepLink = ""
+            }
+        }
     }
 }
 

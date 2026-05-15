@@ -22,6 +22,11 @@ struct RewardOverlayView: View {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    /// Cross-view deep link: when the user taps "Claim in the Quests tab",
+    /// we write a target here and dismiss; ContentView observes the same key
+    /// and switches selectedTab to Quests. (P2-6)
+    @AppStorage("pendingDeepLink") private var pendingDeepLink: String = ""
+
     // Animation phase states
     @State private var showPulse = false
     @State private var showRewardBg = false
@@ -263,6 +268,7 @@ struct RewardOverlayView: View {
                     rewardPill(
                         target: result.xp,
                         label: "XP",
+                        icon: "star.fill",
                         color: FFTheme.Accent.gold
                     )
                 }
@@ -270,6 +276,7 @@ struct RewardOverlayView: View {
                     rewardPill(
                         target: result.coins,
                         label: "COINS",
+                        icon: "bitcoinsign.circle.fill",
                         color: FFTheme.Accent.orange
                     )
                 }
@@ -277,6 +284,7 @@ struct RewardOverlayView: View {
                     rewardPill(
                         target: result.bonusXP,
                         label: "BONUS",
+                        icon: "sparkles",
                         color: FFTheme.Accent.gold.opacity(0.7)
                     )
                 }
@@ -284,8 +292,15 @@ struct RewardOverlayView: View {
         }
     }
 
-    private func rewardPill(target: Int, label: String, color: Color) -> some View {
+    /// Reward pill with icon-above-number layout. The icon differentiates
+    /// XP (star) from Coins (currency disc) from Bonus (sparkles) so the
+    /// pills don't all read as "gold-yellow numbers" at small size (P2-5).
+    private func rewardPill(target: Int, label: String, icon: String, color: Color) -> some View {
         VStack(spacing: 2) {
+            Image(systemName: icon)
+                .font(.caption2)
+                .foregroundStyle(color.opacity(0.8))
+                .accessibilityHidden(true)
             if startCountUp {
                 CountUpText(
                     target: target,
@@ -352,9 +367,19 @@ struct RewardOverlayView: View {
                             .foregroundStyle(FFTheme.Text.secondary)
                     }
                 }
-                Text("Claim in the Quests tab")
-                    .font(.caption2)
-                    .foregroundStyle(FFTheme.Text.tertiary)
+                Button {
+                    pendingDeepLink = "quests"
+                    onDismiss()
+                } label: {
+                    HStack(spacing: 4) {
+                        Text("Claim in the Quests tab")
+                        Image(systemName: "arrow.right")
+                    }
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(FFTheme.Accent.blue)
+                }
+                .buttonStyle(.plain)
+                .accessibilityHint("Dismisses the reward and opens the Quests tab")
             }
         }
     }

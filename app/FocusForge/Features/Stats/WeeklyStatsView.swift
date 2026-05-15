@@ -42,6 +42,17 @@ struct WeeklyStatsView: View {
 
         return ScrollView {
             VStack(spacing: FFTheme.Spacing.lg) {
+                // Empty-state hint for fresh installs — surfaces what the chart
+                // will eventually fill with so day-1 users don't see seven empty
+                // bars and conclude the chart is broken (P2-15).
+                if totalMinutes == 0 {
+                    Text("Your weekly focus minutes will plot here as you go.")
+                        .font(.footnote)
+                        .foregroundStyle(FFTheme.Text.tertiary)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, FFTheme.Spacing.md)
+                        .padding(.horizontal, FFTheme.Spacing.lg)
+                }
                 Chart(last7Days) { day in
                     BarMark(
                         x: .value("Day", day.dayLabel),

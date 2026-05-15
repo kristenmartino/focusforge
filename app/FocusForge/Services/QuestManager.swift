@@ -18,25 +18,29 @@ enum QuestManager {
 
     // MARK: - Template Catalog
 
+    // Quest descriptions: deliberately don't repeat the title's content
+    // (which gave us "Complete 3 focus sessions" / "Finish 3 full focus sessions today")
+    // — instead they carry the deadline or motivating angle, so the row reads as
+    //   "Complete 3 focus sessions / Resets at midnight" (P2-12)
     static let dailyTemplates: [QuestTemplate] = [
         QuestTemplate(
             metricType: .sessionsCompleted,
             titleFormat: "Complete %d focus sessions",
-            descFormat: "Finish %d full focus sessions today",
+            descFormat: "Resets at midnight",
             targetRange: 2...4,
             baseCoins: 15, baseXP: 20
         ),
         QuestTemplate(
             metricType: .minutesFocused,
             titleFormat: "Focus for %d minutes",
-            descFormat: "Accumulate %d minutes of focus time today",
+            descFormat: "Resets at midnight",
             targetRange: 25...60,
             baseCoins: 20, baseXP: 25
         ),
         QuestTemplate(
             metricType: .sessionWithoutCancel,
             titleFormat: "No-quit session",
-            descFormat: "Complete a focus session without canceling",
+            descFormat: "Stay through to the end",
             targetRange: 1...1,
             baseCoins: 10, baseXP: 10
         ),
@@ -46,21 +50,21 @@ enum QuestManager {
         QuestTemplate(
             metricType: .sessionsCompleted,
             titleFormat: "Complete %d sessions this week",
-            descFormat: "Finish %d full focus sessions this week",
+            descFormat: "Resets Sunday night",
             targetRange: 10...15,
             baseCoins: 50, baseXP: 75
         ),
         QuestTemplate(
             metricType: .minutesFocused,
             titleFormat: "Focus for %d minutes this week",
-            descFormat: "Accumulate %d minutes of focus time this week",
+            descFormat: "Resets Sunday night",
             targetRange: 120...300,
             baseCoins: 60, baseXP: 80
         ),
         QuestTemplate(
             metricType: .maintainStreak,
             titleFormat: "Maintain your streak",
-            descFormat: "Keep your streak alive all week",
+            descFormat: "Don't break the chain",
             targetRange: 1...1,
             baseCoins: 40, baseXP: 50
         ),

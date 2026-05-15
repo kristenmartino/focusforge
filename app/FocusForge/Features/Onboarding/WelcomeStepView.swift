@@ -7,15 +7,17 @@ struct WelcomeStepView: View {
         ZStack {
             FFTheme.Background.primary.ignoresSafeArea()
 
-            // Warm ambient glow behind the icon
+            // Warm ambient glow behind the icon — radius and opacity bumped
+            // so the flame feels anchored in atmosphere rather than floating
+            // on a flat dark plane (P2-1).
             RadialGradient(
                 colors: [
-                    FFTheme.Accent.orange.opacity(0.10),
+                    FFTheme.Accent.orange.opacity(0.14),
                     Color.clear,
                 ],
                 center: UnitPoint(x: 0.5, y: 0.35),
                 startRadius: 0,
-                endRadius: 160
+                endRadius: 260
             )
             .ignoresSafeArea()
 
