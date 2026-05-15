@@ -5,22 +5,13 @@ import SwiftData
 /// Shared in-memory model container for tests. Wipes between tests because
 /// each test instantiates a fresh container.
 enum TestSupport {
-    /// Builds an isolated in-memory ModelContainer with the full app schema.
+    /// Builds an isolated in-memory ModelContainer with the v1 versioned schema.
     /// Each test should call this in setUp() so state doesn't bleed.
+    /// Tests run against the same versioned schema the app uses so we catch
+    /// version-related regressions.
     @MainActor
     static func makeContainer() throws -> ModelContainer {
-        let schema = Schema([
-            UserProfile.self,
-            TimerPreset.self,
-            SessionLog.self,
-            StreakState.self,
-            CharacterLoadout.self,
-            InventoryItem.self,
-            UnlockEvent.self,
-            QuestProgress.self,
-            AICoachPreference.self,
-            AIInteractionLog.self,
-        ])
+        let schema = Schema(versionedSchema: FocusForgeSchemaV1.self)
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         return try ModelContainer(for: schema, configurations: [config])
     }

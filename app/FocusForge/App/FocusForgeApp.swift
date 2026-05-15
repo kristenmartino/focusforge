@@ -10,18 +10,9 @@ struct FocusForgeApp: App {
     }
 
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            UserProfile.self,
-            TimerPreset.self,
-            SessionLog.self,
-            StreakState.self,
-            CharacterLoadout.self,
-            InventoryItem.self,
-            UnlockEvent.self,
-            QuestProgress.self,
-            AICoachPreference.self,
-            AIInteractionLog.self,
-        ])
+        // Use the versioned schema (FocusForgeSchemaV1) so future model
+        // changes can be migrated rather than silently dropping user data.
+        let schema = Schema(versionedSchema: FocusForgeSchemaV1.self)
         let modelConfiguration = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false
@@ -29,6 +20,7 @@ struct FocusForgeApp: App {
         do {
             return try ModelContainer(
                 for: schema,
+                migrationPlan: FocusForgeMigrationPlan.self,
                 configurations: [modelConfiguration]
             )
         } catch {
