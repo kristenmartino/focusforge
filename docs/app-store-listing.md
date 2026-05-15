@@ -32,14 +32,15 @@ surfaces. Identical copy everywhere.
 ## Promotional Text (170 char limit)
 
 ```
-Pomodoro that translates focus into character progression. AI Coach runs entirely on-device — your work data never leaves your phone. Solo-built in SwiftUI.
+A hand-built focus tool. Your sessions grow an RPG character. Every coach line written by one person — no AI slop. Solo-built in SwiftUI, on-device, private.
 ```
 
-*156 chars.* Editable post-launch without resubmission, so iterate based on
-which lines hit. Three plays embedded:
-- Category re-frame (Pomodoro → character progression)
-- Privacy structural claim (on-device AI)
-- Founder/craft signal (solo-built)
+*155 chars.* Editable post-launch without resubmission — iterate based on
+which lines hit in App Store Search Ads / referral. Four plays embedded:
+- Craft signal up front ("hand-built")
+- Character/meaning hook ("grow an RPG character")
+- Anti-slop framing ("no AI slop") — the differentiating phrase
+- Founder + privacy as closing technical proof
 
 ---
 
@@ -58,41 +59,47 @@ post-launch by swapping `rpg` ↔ `habits` or `private` ↔ `offline`.
 ## Description (4000 char limit)
 
 ```
-Most productivity apps fail at retention. They externalize discipline — adding streaks, badges, social accountability — and expect that friction to translate into focus. The streak metric optimizes itself and decouples from the underlying goal. "I broke my streak so I quit" is not a user behavior — it's a design output.
+FocusForge is a hand-built focus tool. Every word the coach says was written by one person. Every animation, every color, every glow — chosen deliberately. No AI generating copy. No stock UI templates. No dark patterns. It's a Pomodoro timer that takes itself seriously as a piece of craft.
 
-FocusForge tests the opposite hypothesis: focus tools work better when they translate effort into something you value intrinsically, rather than tracking it as something you have to defend.
+YOUR FOCUS GROWS YOUR CHARACTER
+Each focus session feeds an RPG-style character that grows with your work. Unlock cosmetics at streak milestones — horns at day 3, shadow wings at day 14, an animated rare ray gun at day 60. Coins from sessions buy purely cosmetic upgrades. No pay-to-win. The character is the meaning layer — your progress made tangible, not just tallied.
 
-THE CHARACTER GROWS WITH THE WORK
-Every focus session feeds an RPG-style character progression. Unlock cosmetics at streak milestones — Imp Points at day 3, Shadow Wings at day 14, the Animated Rare Ray Gun at day 60. Coins from sessions buy purely cosmetic upgrades. No pay-to-win. The character is the meaning layer.
+A REWARD MOMENT, NOT A POPUP
+When a session ends, the screen doesn't slide up a notification card. It transforms. The ring pulses, the background crossfades from near-black focus mode to a deep purple atmosphere, particles drift, the headline lands, your XP counts up, and a CTA fades in. Five hand-tuned beats. Tap to skip if you'd rather not linger.
 
-ON-DEVICE AI COACH
-A coach that uploads your work data to a server is a contradiction in terms. FocusForge's AI Coach is template-based and runs entirely on your iPhone. No cloud LLM. No behavioral data leaves your device. Three coach moments:
-• Intent framing before a focus session begins
-• A reflective tip after the session completes
-• A streak rescue nudge near the loss window
+A COACH THAT WAS WRITTEN, NOT GENERATED
+Most "AI coaching" apps wrap a frontier model, and the output reads like it. FocusForge takes the opposite bet. The coach is 33 hand-written templates × 3 tones (encouraging, direct, calm) — about 99 pieces of micro-copy by one writer, routed by your behavior on-device. No cloud LLM. No work data ever leaves your phone. The whole catalog is open-source on GitHub — you can read every line a user might see.
 
-CRAFTED FOR FOCUS
+Three coaching moments:
+• Intent framing before a session begins
+• A reflective tip after it ends
+• A streak rescue nudge before you lose your streak
+
+CRAFTED, NOT ASSEMBLED
+• Two emotional registers: near-black focus mode (one accent color, the character absent) vs. deep purple reward mode (layered glows, particles, dramatic character lighting). The contrast IS the dopamine hit.
+• Timer ring is three composed layers — subtle track, wide glow aura, thin crisp ring. Not a default progress circle.
 • Background-safe timer that drifts less than 1 second over 30 minutes
-• Two-mode design: focus mode (near-black, restrained) and reward mode (deep purple atmosphere, layered glows, cinematic 5-beat reward moment)
 • Daily and weekly quests for variety
-• Stats dashboard: today, 7-day chart, all-time
-• Streak freezes earned at milestones — miss a day, the freeze protects automatically
-• Full VoiceOver, Dynamic Type, WCAG AA contrast, Reduce Motion support
-• Export your progress as JSON before upgrading your phone
+• Streak freezes earned at milestones — miss a day, a freeze protects automatically. No shaming.
+• Stats that respect you — Today, 7-day chart, all-time. No leaderboards, no comparisons, no social pressure.
+• Full VoiceOver, Dynamic Type, WCAG AA contrast measured (not guessed), Reduce Motion variants for every animation
+• Export your full progress as JSON anytime, for when you change phones
 
 DESIGNED + BUILT SOLO
-By Kristen Martino. Built in public — every design decision documented. The AI Coach template engine is open-source on GitHub.
+By Kristen Martino. Built in public — every design decision documented. The coach engine is MIT-licensed on GitHub.
 
 REQUIREMENTS
 iPhone with iOS 17 or later. iPad universal support arrives in v1.1.
 
 PRIVACY
-Crash reports and basic analytics events run through Firebase. AI Coach inference is fully on-device. No work data, task names, or focus content ever leaves your phone.
+Crash reports and basic analytics events run through Firebase, scoped per-install with no user identity. The AI Coach runs entirely on-device. No work data, task names, or focus content ever leaves your phone.
 ```
 
-*~2200 chars.* Plenty of room for expansion. Sections separated by blank
-lines render as paragraphs in App Store. ALL-CAPS section headers read as
-emphasized headings in the App Store description renderer.
+*~2700 chars.* Sections separated by blank lines render as paragraphs in
+App Store. ALL-CAPS section headers read as emphasized headings in the
+App Store description renderer. Craft-led — every section leads with what
+was made by hand, not with feature lists. Privacy claim sits as the
+closing technical footnote, not the headline.
 
 ---
 
@@ -103,9 +110,9 @@ For the v1.0 initial submission:
 ```
 FocusForge v1.0 — the first release.
 
-Build focus habits with a Pomodoro timer that translates each session into RPG-style character progression. Unlock cosmetics on streak milestones. Get on-device AI coaching for intent framing, reflection, and streak rescue — your work data never leaves your phone.
+A hand-built focus tool. Your sessions feed an RPG character that grows with your work. Every coach line was written by one person — 33 templates, 3 tones, ~99 pieces of micro-copy. No cloud LLM, no behavioral data leaves your phone. The coach engine is open-source on GitHub.
 
-Solo-built in SwiftUI by Kristen Martino. Open-source AI Coach engine on GitHub.
+Five hand-tuned reward beats. Two emotional registers — near-black focus mode and deep purple reward mode. Streak freezes at milestones, no shaming. Full VoiceOver, Dynamic Type, Reduce Motion. Built solo in SwiftUI by Kristen Martino.
 ```
 
 For v1.0.1 (TestFlight beta → App Store) the "What's New" pattern is the
