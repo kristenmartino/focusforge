@@ -179,7 +179,12 @@ struct SettingsView: View {
                     #endif
 
                     Section("About") {
-                        LabeledContent("Version", value: "0.5.0")
+                        NavigationLink {
+                            AboutView()
+                        } label: {
+                            Label("About FocusForge", systemImage: "info.circle")
+                        }
+                        LabeledContent("Version", value: aboutVersionShort)
                     }
                     .listRowBackground(Color.white.opacity(0.04))
                 }
@@ -248,6 +253,16 @@ struct SettingsView: View {
             get: { preset.sessionsBeforeLongBreak },
             set: { preset.sessionsBeforeLongBreak = PresetManager.clampSessionsBeforeLongBreak($0) }
         )
+    }
+
+    // MARK: - Version display
+
+    /// Short version display for the Settings About row. Pulls from
+    /// Info.plist so it doesn't drift from the build number. The full
+    /// "Version X (build)" string lives in AboutView's footer.
+    private var aboutVersionShort: String {
+        let short = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
+        return short
     }
 }
 
