@@ -57,9 +57,9 @@ parameters. Source of truth: `AnalyticsEvent` enum in
 
 | Event | Where | Trigger | Parameters |
 |---|---|---|---|
-| `session_started` | `TimerView.swift:411` | User taps "Start Focus" and the timer begins (after IntentFraming if shown) | `session_type` ("focus" / "shortBreak" / "longBreak"), `planned_duration_seconds` |
-| `session_completed` | `SessionLogger.swift:67` | A timer reaches its full duration | `session_type`, `task_name_length` (no actual task name, just char count), `actual_duration_seconds`, `planned_duration_seconds`, `xp_earned`, `coins_earned` |
-| `session_abandoned` | `SessionLogger.swift:111` | User taps Stop before the timer reaches duration | `session_type`, `task_name_length`, `actual_duration_seconds`, `planned_duration_seconds` |
+| `session_started` | `TimerView.swift:411` | User taps "Start Focus" and the timer begins (after IntentFraming if shown) | `phase` ("focus" / "shortBreak" / "longBreak"), `planned_duration_seconds` |
+| `session_completed` | `SessionLogger.swift:67` | A timer reaches its full duration | `phase`, `task_name_length` (no actual task name, just char count), `actual_duration_seconds`, `planned_duration_seconds`, `xp_earned`, `coins_earned` |
+| `session_abandoned` | `SessionLogger.swift:111` | User taps Stop before the timer reaches duration | `phase`, `task_name_length`, `actual_duration_seconds`, `planned_duration_seconds` |
 
 ### Streak progression
 
@@ -222,18 +222,25 @@ Tick each event when confirmed in DebugView:
 ## Parameter naming convention
 
 Events use **snake_case** for the event name (`session_started`).
-Parameters use **snake_case** for keys (`session_type`,
+Parameters use **snake_case** for keys (`phase`,
 `planned_duration_seconds`). This matches Google's recommended
 convention and makes the BigQuery export schema cleaner if we ever
 need to query raw event data.
 
-Some current call sites use camelCase parameter keys (e.g.
-`taskNameLength`). Before the v1.0 submission, audit and normalize
-all parameter keys to snake_case to avoid mixed conventions in the
-Firebase Analytics dashboard.
+**Audit complete 2026-05-15.** All parameter keys verified snake_case.
+Duration parameters normalized to `_duration_seconds` (was mixed
+`_minutes` for completion, `_seconds` for abandonment). Boolean
+`task_named` replaced with integer `task_name_length` (char count)
+across all three session events — privacy-preserving (never the
+string) but more useful for analytics.
 
-**Audit task:** grep for parameter keys, list any using camelCase,
-file an issue for normalization.
+Unified shape of duration params across session events:
+
+| Event | `planned_duration_seconds` | `actual_duration_seconds` | `task_name_length` |
+|---|---|---|---|
+| `session_started` | ✓ | n/a | ✓ |
+| `session_completed` | ✓ | ✓ | ✓ |
+| `session_abandoned` | ✓ | ✓ | ✓ |
 
 ## Privacy guarantees re-checked
 

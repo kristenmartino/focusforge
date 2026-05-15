@@ -410,8 +410,12 @@ struct TimerView: View {
         notificationService.scheduleCompletion(in: duration, sessionType: engine.currentSessionType)
         AnalyticsService.track(.sessionStarted, parameters: [
             "phase": engine.currentSessionType.rawValue,
-            "planned_minutes": Int(duration / 60),
-            "task_named": !taskName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            "planned_duration_seconds": Int(duration),
+            // task_name_length (int char count) is more useful for analytics
+            // than a bare "task_named" bool — preserves the privacy property
+            // (only the length, never the string) while letting us derive
+            // both "did they name it" (length > 0) and naming-intentionality.
+            "task_name_length": taskName.trimmingCharacters(in: .whitespacesAndNewlines).count
         ])
     }
 

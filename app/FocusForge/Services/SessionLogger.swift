@@ -66,13 +66,16 @@ enum SessionLogger {
 
         AnalyticsService.track(.sessionCompleted, parameters: [
             "phase": sessionType.rawValue,
-            "planned_minutes": Int(plannedDuration / 60),
-            "actual_minutes": Int(Date.now.timeIntervalSince(startedAt) / 60),
+            "planned_duration_seconds": Int(plannedDuration),
+            "actual_duration_seconds": Int(Date.now.timeIntervalSince(startedAt)),
             "xp_earned": totalXP,
             "coins_earned": base.coins,
             "streak_days": streakDays,
             "leveled_up": leveledUp,
-            "task_named": !taskName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            // task_name_length (int char count) — privacy-preserving, never
+            // the string itself. See TimerView.startSessionDirectly() for
+            // the full rationale.
+            "task_name_length": taskName.trimmingCharacters(in: .whitespacesAndNewlines).count
         ])
 
         return SessionResult(
@@ -110,9 +113,10 @@ enum SessionLogger {
 
         AnalyticsService.track(.sessionAbandoned, parameters: [
             "phase": sessionType.rawValue,
-            "planned_seconds": Int(plannedDuration),
-            "actual_seconds": Int(actualDuration),
-            "completion_fraction": plannedDuration > 0 ? actualDuration / plannedDuration : 0
+            "planned_duration_seconds": Int(plannedDuration),
+            "actual_duration_seconds": Int(actualDuration),
+            "completion_fraction": plannedDuration > 0 ? actualDuration / plannedDuration : 0,
+            "task_name_length": taskName.trimmingCharacters(in: .whitespacesAndNewlines).count
         ])
     }
 
