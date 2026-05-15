@@ -72,7 +72,10 @@ struct DressingRoomView: View {
                     .padding(.horizontal)
                     .animation(reduceMotion ? .none : .default, value: selectedSlot)
                 }
-                .padding(.bottom, FFTheme.Spacing.lg)
+                // Generous bottom padding so the last inventory row clears
+                // the tab bar with visible breathing room. Without this the
+                // last items read as "clipped" even though they're scrollable.
+                .padding(.bottom, 60)
             }
         }
         .overlay(alignment: .bottom) {

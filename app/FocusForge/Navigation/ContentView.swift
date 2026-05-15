@@ -24,6 +24,13 @@ struct ContentView: View {
     @AppStorage("pendingDeepLink") private var pendingDeepLink: String = ""
 
     private var shouldShowBanner: Bool {
+        // Scope the banner to the Timer tab. On other tabs (Settings, Stats,
+        // Quests, Character) it would overlap the navigation title, and the
+        // banner's job — push the user to start a session — only makes sense
+        // when they're on the Timer surface anyway. On other tabs, the streak
+        // status is communicated through quieter affordances (the "Day N"
+        // badge near the character, the Streak stat card, etc.).
+        guard selectedTab == 0 else { return false }
         guard !bannerDismissed else { return false }
         #if DEBUG
         if debugForceStreakRescueBanner {

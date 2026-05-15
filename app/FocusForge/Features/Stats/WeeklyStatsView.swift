@@ -54,19 +54,28 @@ struct WeeklyStatsView: View {
                         .padding(.horizontal, FFTheme.Spacing.lg)
                 }
                 Chart(last7Days) { day in
+                    // Ghost bar for empty days so the chart's structure is
+                    // visible even when sparse. Without this, days with zero
+                    // minutes render as nothing — the labels imply structure
+                    // the bars don't reinforce. Empty bars use a faint blue
+                    // at 8% opacity, just enough to read as "placeholder."
                     BarMark(
                         x: .value("Day", day.dayLabel),
-                        y: .value("Minutes", day.minutes)
+                        y: .value("Minutes", day.minutes > 0 ? Double(day.minutes) : 0.5)
                     )
                     .foregroundStyle(
-                        LinearGradient(
-                            colors: [
-                                FFTheme.Accent.blue,
-                                FFTheme.Accent.blue.opacity(0.6),
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
+                        day.minutes > 0
+                            ? AnyShapeStyle(
+                                LinearGradient(
+                                    colors: [
+                                        FFTheme.Accent.blue,
+                                        FFTheme.Accent.blue.opacity(0.6),
+                                    ],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                            : AnyShapeStyle(FFTheme.Accent.blue.opacity(0.08))
                     )
                     .cornerRadius(4)
                     .accessibilityLabel(day.dayLabel)

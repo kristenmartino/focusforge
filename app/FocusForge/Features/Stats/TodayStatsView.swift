@@ -25,6 +25,18 @@ struct TodayStatsView: View {
 
     var body: some View {
         ScrollView {
+            // Empty-state callout when there's been no focus today. Without
+            // this, the user sees six "0" cards and the screen reads as a
+            // dashboard with no story. The callout addresses the user
+            // directly — "your character is waiting" — and lets the screen
+            // pivot from "nothing happened" to "something is supposed to."
+            if todayCompleted.isEmpty {
+                emptyStateBanner
+                    .padding(.horizontal, FFTheme.Spacing.md)
+                    .padding(.top, FFTheme.Spacing.md)
+                    .padding(.bottom, FFTheme.Spacing.xs)
+            }
+
             LazyVGrid(columns: columns, spacing: FFTheme.Spacing.sm) {
                 StatCardView(
                     title: "Sessions",
@@ -71,5 +83,39 @@ struct TodayStatsView: View {
             }
             .padding()
         }
+    }
+
+    /// Empty state shown above the zero-stat grid when no focus session has
+    /// completed today. Uses the locked character framing — "your character
+    /// is waiting" — to keep the tone consistent with the rest of the app.
+    private var emptyStateBanner: some View {
+        HStack(spacing: FFTheme.Spacing.sm) {
+            Image(systemName: "moon.stars.fill")
+                .font(.title3)
+                .foregroundStyle(FFTheme.Accent.purple)
+                .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("No focus yet today")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(FFTheme.Text.primary)
+                Text("Your character is waiting.")
+                    .font(.footnote)
+                    .foregroundStyle(FFTheme.Text.secondary)
+            }
+
+            Spacer()
+        }
+        .padding(FFTheme.Spacing.md)
+        .background(
+            RoundedRectangle(cornerRadius: FFTheme.Radius.md)
+                .fill(FFTheme.Accent.purple.opacity(0.06))
+                .overlay(
+                    RoundedRectangle(cornerRadius: FFTheme.Radius.md)
+                        .stroke(FFTheme.Accent.purple.opacity(0.15), lineWidth: 0.5)
+                )
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("No focus yet today. Your character is waiting.")
     }
 }

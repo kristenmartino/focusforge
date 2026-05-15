@@ -46,10 +46,14 @@ struct AboutView: View {
                 .foregroundStyle(FFTheme.Text.primary)
                 .accessibilityAddTraits(.isHeader)
 
+            // Locked positioning sentence. Medium weight so it lands as
+            // claim, not caption. Matches the same string used across the
+            // App Store subtitle, README, and portfolio surfaces.
             Text("Your focus grows your character.")
-                .font(.body)
+                .font(.body.weight(.medium))
                 .foregroundStyle(FFTheme.Text.secondary)
                 .multilineTextAlignment(.center)
+                .padding(.bottom, FFTheme.Spacing.xxs)
 
             Text("A hand-built focus tool by Kristen Martino.")
                 .font(.footnote)
