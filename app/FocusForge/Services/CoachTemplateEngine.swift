@@ -3,7 +3,12 @@ import SwiftData
 
 // MARK: - Result Types
 
-struct FramingResult {
+struct FramingResult: Identifiable {
+    /// Per-instance UUID so this struct is usable as the item parameter
+    /// of `.sheet(item:)`. SwiftUI uses it to identify *which* framing
+    /// is being presented; the templateID isn't unique enough (the same
+    /// template can be selected twice in a row in theory).
+    let id = UUID()
     let templateID: String
     let originalTask: String
     let reframedTask: String

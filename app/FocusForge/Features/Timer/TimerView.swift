@@ -16,9 +16,19 @@ struct TimerView: View {
     @State private var showRewardOverlay = false
     @State private var completionResult: SessionResult?
     @State private var completionReflection: ReflectionResult?
-    @State private var showMilestone = false
-    @State private var pendingMilestone: MilestoneReward?
-    @State private var showIntentFraming = false
+    /// Captured when a session completes that unlocks a milestone, but
+    /// not yet presented — we want the reward overlay to dismiss first
+    /// and then a short pause before the milestone sheet appears. See
+    /// `dismissReward()` for the handoff to `milestoneToPresent`.
+    @State private var queuedMilestone: MilestoneReward?
+    /// Drives the milestone sheet via `.sheet(item:)`. Set after the
+    /// reward overlay dismisses + a 0.5s pause.
+    @State private var milestoneToPresent: MilestoneReward?
+    /// Drives the intent-framing sheet via `.sheet(item:)`. Setting to
+    /// a non-nil value both stores the framing AND triggers the sheet —
+    /// using a single optional avoids the iOS 26 SwiftUI state-ordering
+    /// bug where a separate boolean trigger would evaluate the sheet
+    /// content closure before the optional's mutation had propagated.
     @State private var currentFraming: FramingResult?
 
     private let ringSize: CGFloat = 260
@@ -97,32 +107,39 @@ struct TimerView: View {
             .onChange(of: engine.state) { oldState, newState in
                 handleStateChange(from: oldState, to: newState)
             }
-            .sheet(isPresented: $showIntentFraming) {
-                if let framing = currentFraming {
-                    IntentFramingView(
-                        framing: framing,
-                        onAccept: { acceptedTask in
-                            logFramingInteraction(templateID: framing.templateID, outcome: .accepted)
-                            showIntentFraming = false
-                            taskName = acceptedTask
-                            startSessionDirectly()
-                        },
-                        onSkip: {
-                            logFramingInteraction(templateID: framing.templateID, outcome: .dismissed)
-                            showIntentFraming = false
-                            startSessionDirectly()
-                        }
-                    )
-                }
-            }
-            .sheet(isPresented: $showMilestone) {
-                if let milestone = pendingMilestone {
-                    MilestoneUnlockView(milestone: milestone) {
-                        showMilestone = false
-                        pendingMilestone = nil
+            // `.sheet(item:)` rather than `.sheet(isPresented:)` — the
+            // latter combined with a separate optional data state hit an
+            // iOS 26 SwiftUI bug where the sheet's content closure
+            // evaluated before the optional's mutation propagated, and
+            // `if let framing = currentFraming` short-circuited to
+            // EmptyView. The user saw a black sheet (the
+            // `.presentationBackground`) with no content. Driving the
+            // sheet directly off the optional fixes it.
+            .sheet(item: $currentFraming) { framing in
+                IntentFramingView(
+                    framing: framing,
+                    onAccept: { acceptedTask in
+                        logFramingInteraction(templateID: framing.templateID, outcome: .accepted)
+                        currentFraming = nil
+                        taskName = acceptedTask
+                        startSessionDirectly()
+                    },
+                    onSkip: {
+                        logFramingInteraction(templateID: framing.templateID, outcome: .dismissed)
+                        currentFraming = nil
+                        startSessionDirectly()
                     }
-                    .presentationBackground(Color.clear)
+                )
+            }
+            // Same `.sheet(item:)` pattern as above, for the same reason.
+            // `milestoneToPresent` is set in `dismissReward()` after a
+            // 0.5s pause so the milestone sheet doesn't race the reward
+            // overlay's exit animation.
+            .sheet(item: $milestoneToPresent) { milestone in
+                MilestoneUnlockView(milestone: milestone) {
+                    milestoneToPresent = nil
                 }
+                .presentationBackground(Color.clear)
             }
         }
     }
@@ -370,8 +387,9 @@ struct TimerView: View {
                 tone: tone,
                 in: modelContext
             )
+            // Setting the optional both stores the framing and triggers
+            // the `.sheet(item:)` presentation in one mutation.
             currentFraming = framing
-            showIntentFraming = true
         } else {
             startSessionDirectly()
         }
@@ -469,7 +487,10 @@ struct TimerView: View {
         }
 
         if let milestone = result.newMilestone {
-            pendingMilestone = milestone
+            // Stored here, presented later by `dismissReward()` once the
+            // reward overlay is gone (queuedMilestone, not the sheet
+            // trigger, so the sheet doesn't race the reward animation).
+            queuedMilestone = milestone
         }
     }
 
@@ -493,9 +514,14 @@ struct TimerView: View {
         }
         taskName = ""
 
-        if pendingMilestone != nil {
+        if let milestone = queuedMilestone {
+            queuedMilestone = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                showMilestone = true
+                // Trigger the `.sheet(item:)` presentation. The 0.5s
+                // pause lets the reward overlay finish its exit
+                // animation so the milestone sheet doesn't pop in over
+                // a still-fading background.
+                milestoneToPresent = milestone
             }
         }
     }
