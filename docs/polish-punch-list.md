@@ -15,70 +15,28 @@ commit reference.
 - ~~**GroundPlane invisible in dressing room.**~~ Fixed in `23646e0`
   — bumped line opacity 0.06→0.12 and glow opacity 0.08→0.18. The
   character now has a stage.
+- ~~**P1 — Inventory grid items clipped by tab bar.**~~ Fixed in
+  `04a6ea7` — bumped ScrollView bottom padding from `Spacing.lg`
+  (20pt) to 60pt. Last row of items now clears the tab bar with
+  visible breathing room.
+- ~~**P2 — Stats Today view emotionally flat when empty.**~~ Fixed
+  in `04a6ea7` — added emptyStateBanner above the zero-stat grid:
+  "No focus yet today / Your character is waiting." in a purple-tinted
+  card. Pivots screen from observation to invitation.
+- ~~**P3 — Stats 7-Day chart empty days invisible.**~~ Fixed in
+  `04a6ea7` — empty days now render as faint placeholder bars at 8%
+  blue opacity, 0.5min height. Chart structure visible even when
+  sparse. Accessibility values still read the real minute count.
+- ~~**P4 — Streak rescue banner overlaps navigation title.**~~ Fixed
+  in `04a6ea7` — scoped the banner to the Timer tab (`selectedTab == 0`).
+  Other tabs no longer have the banner fighting their nav titles. The
+  banner's job is to push users to start a session, only contextually
+  relevant on Timer.
+- ~~**P5 — Tagline weight on AboutView hero.**~~ Fixed in `04a6ea7` —
+  "Your focus grows your character." now `.body.weight(.medium)` with
+  xxs bottom padding. Lands as claim, not caption.
 
 ## Outstanding — actionable
-
-### P1 — Inventory grid items clipped by tab bar (Character tab)
-
-The bottom row of cosmetic items in the dressing room is partially
-hidden behind the tab bar. Users have to scroll to see them. Fix is
-likely a `safeAreaInset(edge: .bottom, ...)` modifier or extra
-padding at the bottom of the scroll view in `DressingRoomView`.
-
-### P2 — Stats Today view is emotionally flat when empty
-
-When no sessions completed today, every card reads "0" — accurate but
-not engaging. Two options:
-
-1. Add a friendly empty-state callout above the stat grid: "No
-   sessions today — your character is waiting" with a "Start a
-   session" CTA that deep-links to the Timer tab.
-2. Replace zeros with motivating placeholders ("—" or "Start your
-   first") while preserving the layout.
-
-Pick option 1 — keeps the layout consistent while addressing the
-empty-state UX.
-
-### P3 — Stats 7-Day chart empty days are invisible
-
-When most days have no data, the chart shows one tall bar and a lot
-of empty space. The day labels (Sat / Sun / Mon...) imply structure
-that the bars don't reinforce.
-
-Fix: render ghost bars on empty days at very low opacity (e.g.
-`FFTheme.Accent.blue.opacity(0.04)`) at a fixed minimal height (~2-3
-pt) so the chart's grid structure is visible even when sparse.
-
-### P4 — Streak rescue banner overlaps navigation title
-
-When the streak rescue banner is showing (in production: when
-`streakRiskScore > threshold`; in dev: when the debug toggle is on),
-it renders at the global ContentView level above the tab content,
-which means it covers the navigation title bar on whichever tab the
-user is on. The "About" nav title, the "Stats" nav title, etc. are
-all hidden behind the banner.
-
-Two architectural fix options:
-
-1. **Push the banner below the navigation bar.** Render it inside
-   each tab's NavigationStack as a `safeAreaInset(edge: .top, ...)`
-   so it sits below the nav title rather than over it.
-2. **Push the tab content down when the banner is showing.**
-   ContentView already conditionally shows the banner — also adjust
-   the tab content's `.padding(.top, ...)` to account for the
-   banner's height.
-
-Option 1 is cleaner architecturally but requires more refactoring
-since the banner currently lives at the ContentView level.
-
-### P5 — Tagline weight on AboutView hero
-
-The "Your focus grows your character." tagline on the About hero
-block uses `.body` (regular weight). The locked positioning sentence
-deserves more weight to land harder.
-
-Fix: change to `.body.weight(.medium)` and bump the bottom padding by
-4-8 pt for more breathing room.
 
 ### P6 — Settings form controls inconsistent dark styling
 
@@ -93,24 +51,25 @@ explicit `.tint(FFTheme.Accent.blue)` on every control.
 
 ## Outstanding — nice-to-have
 
-### N1 — Character sprite slightly small on Timer screen
+### ~~N1 — Character sprite size on Timer~~ Fixed in `<next-commit>`
 
-The character at the top of the Timer view is ~50pt. Given the
-"character is the meaning layer" thesis, slightly larger (60-70pt)
-might give it more presence without dominating.
+Bumped from 64pt → 80pt. Character now anchors the Timer screen with
+more presence, matching the "your focus grows your character"
+positioning. Still small enough to preserve focus-mode restraint.
 
-### N2 — Stats chart bar styling could use a subtle gradient
+### ~~N2 — Chart bar gradient~~ Already done
 
-Current bars use flat `FFTheme.Accent.blue`. A subtle vertical
-gradient (top: full blue, bottom: blue at 0.7 opacity) would echo
-the timer ring's atmospheric layering.
+Verified: WeeklyStatsView already uses
+`LinearGradient([blue, blue.opacity(0.6)], top, bottom)` on every
+real bar. The note was based on a misread of the simulator screenshot.
+Empty-day ghost bars use a flat 8% opacity (intentional — they're
+placeholders, not data).
 
-### N3 — Quest reward icons (XP star, Coins disc) could be more refined
+### ~~N3 — Coin icon consistency~~ Fixed in `<next-commit>`
 
-Currently using SF Symbols `star.fill` and `circle.fill`. The
-`circle.fill` for Coins doesn't read as "currency" — it reads as
-"dot." Consider `bitcoinsign.circle.fill` (already used in the
-reward overlay) or a custom asset.
+Replaced `circle.fill` (read as ornamental dot) with
+`bitcoinsign.circle.fill` (reads as currency) in both QuestRowView
+and TodayStatsView. Now matches the icon used in RewardOverlayView.
 
 ---
 

@@ -71,7 +71,7 @@ struct TodayStatsView: View {
                 StatCardView(
                     title: "Session Coins",
                     value: "\(todayCompleted.reduce(0) { $0 + $1.coinsEarned })",
-                    icon: "circle.fill",
+                    icon: "bitcoinsign.circle.fill",
                     color: FFTheme.Accent.orange
                 )
                 StatCardView(

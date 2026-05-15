@@ -139,8 +139,13 @@ struct TimerView: View {
             // ("your focus grows your character") even on the timer screen. Hidden during
             // active session to preserve focus mode restraint.
             if engine.state == .idle, let loadout = loadouts.first {
-                CharacterSpriteView(loadout: loadout, size: 64)
-                    .frame(height: 64)
+                // Sized at 80pt to give the character real presence on the
+                // idle Timer screen. The character anchors the positioning
+                // ("your focus grows your character") — too small and it
+                // reads as a decoration rather than a meaning layer.
+                // Hidden during active session to preserve focus mode restraint.
+                CharacterSpriteView(loadout: loadout, size: 80)
+                    .frame(height: 80)
                     .padding(.bottom, FFTheme.Spacing.xs)
                     .transition(.opacity)
                     .accessibilityLabel("Your character")

@@ -104,7 +104,11 @@ struct QuestRowView: View {
                 }
                 if quest.rewardCoins > 0 {
                     HStack(spacing: 3) {
-                        Image(systemName: "circle.fill")
+                        // bitcoinsign.circle.fill matches the icon used in
+                        // RewardOverlayView so "coins" reads consistently as
+                        // currency across surfaces (instead of a bare dot
+                        // that could read as just an ornamental bullet).
+                        Image(systemName: "bitcoinsign.circle.fill")
                             .font(.caption2)
                             .accessibilityHidden(true)
                         Text("\(quest.rewardCoins) Coins")
