@@ -42,7 +42,16 @@ struct QuestListView: View {
                                             )
                                         }
                                     }
-                                    .listRowBackground(Color.white.opacity(0.04))
+                                    .listRowBackground(
+                                        RoundedRectangle(cornerRadius: FFTheme.Radius.md)
+                                            .fill(Color.white.opacity(0.05))
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: FFTheme.Radius.md)
+                                                    .stroke(FFTheme.Border.default, lineWidth: 0.5)
+                                            )
+                                            .padding(.vertical, 2)
+                                    )
+                                    .listRowSeparator(.hidden)
                                 }
                             }
                             if !weeklyQuests.isEmpty {
@@ -55,7 +64,16 @@ struct QuestListView: View {
                                             )
                                         }
                                     }
-                                    .listRowBackground(Color.white.opacity(0.04))
+                                    .listRowBackground(
+                                        RoundedRectangle(cornerRadius: FFTheme.Radius.md)
+                                            .fill(Color.white.opacity(0.05))
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: FFTheme.Radius.md)
+                                                    .stroke(FFTheme.Border.default, lineWidth: 0.5)
+                                            )
+                                            .padding(.vertical, 2)
+                                    )
+                                    .listRowSeparator(.hidden)
                                 }
                             }
                         }

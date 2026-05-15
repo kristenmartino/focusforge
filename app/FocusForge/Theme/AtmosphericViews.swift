@@ -126,6 +126,11 @@ struct CharacterSceneBackground: View {
 // MARK: - Ground Plane
 
 /// A subtle horizontal light line with underglow, placed beneath the character.
+/// The line + underglow imply a floor without rendering one. Without this the
+/// character reads as floating in negative space, which feels like a render bug
+/// rather than minimalism. Tuned opacities (0.12 line / 0.18 glow) so the
+/// plane is legible against `Background.primary` while still feeling
+/// atmospheric, not present.
 struct GroundPlane: View {
     var color: Color = Color.white
     var width: CGFloat = 200
@@ -136,7 +141,7 @@ struct GroundPlane: View {
             Rectangle()
                 .fill(
                     LinearGradient(
-                        colors: [.clear, color.opacity(0.06), .clear],
+                        colors: [.clear, color.opacity(0.12), .clear],
                         startPoint: .leading,
                         endPoint: .trailing
                     )
@@ -147,13 +152,13 @@ struct GroundPlane: View {
             Ellipse()
                 .fill(
                     RadialGradient(
-                        colors: [color.opacity(0.08), .clear],
+                        colors: [color.opacity(0.18), .clear],
                         center: .center,
                         startRadius: 0,
                         endRadius: width * 0.4
                     )
                 )
-                .frame(width: width * 0.6, height: 12)
+                .frame(width: width * 0.6, height: 14)
         }
     }
 }
