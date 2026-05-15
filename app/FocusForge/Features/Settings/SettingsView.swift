@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import FocusForgeCoachEngine
 
 struct SettingsView: View {
     @Query(filter: #Predicate<TimerPreset> { $0.isDefault == true })

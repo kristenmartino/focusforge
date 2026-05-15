@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import FocusForgeCoachEngine
 
 struct AICoachSettingsView: View {
     @Query private var preferences: [AICoachPreference]

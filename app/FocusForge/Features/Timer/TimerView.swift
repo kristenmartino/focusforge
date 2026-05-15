@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import FocusForgeCoachEngine
 
 struct TimerView: View {
     @Environment(TimerEngine.self) private var engine
@@ -381,12 +382,14 @@ struct TimerView: View {
         if engine.currentSessionType == .focus && framingEnabled && !taskName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             let signal = BehaviorSignalComputer.compute(in: modelContext)
             let tone = preference?.tone ?? .encouraging
+            let history = SwiftDataTemplateUsageHistory(context: modelContext)
             let framing = CoachTemplateEngine.selectFramingTemplate(
                 taskName: taskName,
                 signal: signal,
                 tone: tone,
-                in: modelContext
+                history: history
             )
+            history.recordShown(templateID: framing.templateID, featureType: .framing)
             // Setting the optional both stores the framing and triggers
             // the `.sheet(item:)` presentation in one mutation.
             currentFraming = framing
@@ -470,14 +473,24 @@ struct TimerView: View {
             let tone = preference?.tone ?? .encouraging
             let actualMinutes = Int(engine.totalDuration / 60)
             let plannedMinutes = actualMinutes
-            completionReflection = CoachTemplateEngine.selectReflectionTemplate(
-                outcome: .completed,
+            let history = SwiftDataTemplateUsageHistory(context: modelContext)
+            // Bridge the app's SessionOutcome.completed to the package's
+            // identically-shaped enum via raw value — keeps the two
+            // SessionOutcome types decoupled (app-domain vs engine-domain)
+            // without forcing every callsite to qualify.
+            let packageOutcome = FocusForgeCoachEngine.SessionOutcome(
+                rawValue: SessionOutcome.completed.rawValue
+            ) ?? .completed
+            let reflection = CoachTemplateEngine.selectReflectionTemplate(
+                outcome: packageOutcome,
                 actualMinutes: actualMinutes,
                 plannedMinutes: plannedMinutes,
                 signal: signal,
                 tone: tone,
-                in: modelContext
+                history: history
             )
+            history.recordShown(templateID: reflection.templateID, featureType: .reflection)
+            completionReflection = reflection
         } else {
             completionReflection = nil
         }

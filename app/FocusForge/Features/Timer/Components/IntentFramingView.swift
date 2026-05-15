@@ -1,4 +1,5 @@
 import SwiftUI
+import FocusForgeCoachEngine
 
 /// Pre-session coach moment. Shows the reframed version of the user's task
 /// with options to accept, edit, or skip. Presented as a medium sheet over

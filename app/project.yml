@@ -12,6 +12,9 @@ packages:
   Firebase:
     url: https://github.com/firebase/firebase-ios-sdk
     from: "11.0.0"
+  FocusForgeCoachEngine:
+    url: https://github.com/kristenmartino/focusforge-coach-engine
+    from: "1.0.0"
 
 settings:
   base:
@@ -39,6 +42,8 @@ targets:
         product: FirebaseCrashlytics
       - package: Firebase
         product: FirebaseRemoteConfig
+      - package: FocusForgeCoachEngine
+        product: FocusForgeCoachEngine
     postBuildScripts:
       - name: Upload Crashlytics dSYMs
         script: |

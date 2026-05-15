@@ -1,4 +1,5 @@
 import SwiftUI
+import FocusForgeCoachEngine
 
 /// Full-screen cinematic reward overlay. Replaces the sheet-based SessionCompletionView
 /// with an in-place transition that morphs the timer screen into the reward screen.

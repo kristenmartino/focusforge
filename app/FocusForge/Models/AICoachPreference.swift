@@ -1,25 +1,6 @@
 import Foundation
 import SwiftData
-
-enum CoachTone: String, Codable, CaseIterable {
-    case encouraging
-    case direct
-    case calm
-}
-
-enum NudgeFrequency: String, Codable, CaseIterable {
-    case low      // max 1 nudge per 24h
-    case medium   // max 1 nudge per 12h
-    case high     // max 1 nudge per 6h
-
-    var cooldownSeconds: TimeInterval {
-        switch self {
-        case .low: 24 * 3600
-        case .medium: 12 * 3600
-        case .high: 6 * 3600
-        }
-    }
-}
+import FocusForgeCoachEngine
 
 @Model
 final class AICoachPreference {

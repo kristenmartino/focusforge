@@ -1,4 +1,5 @@
 import SwiftUI
+import FocusForgeCoachEngine
 
 /// Post-session reflection tip. Rendered inline inside `RewardOverlayView`
 /// (beat 4-5) so this view is the content, not its own scene — the

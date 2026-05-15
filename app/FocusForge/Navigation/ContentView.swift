@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import FocusForgeCoachEngine
 
 struct ContentView: View {
     @Query(filter: #Predicate<QuestProgress> { $0.isCompleted && !$0.isClaimed })
