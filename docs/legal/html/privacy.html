@@ -198,7 +198,8 @@
 <p>Uninstall the app. Your Firebase App Instance ID resets, and any analytics or crash data on Firebase that was tied to that ID becomes unattributable. You can also email us at <a href="mailto:privacy@kristenmartino.ai">privacy@kristenmartino.ai</a> and we'll request deletion through Google's tooling.</p>
 
 <h3>Right to opt out of analytics</h3>
-<p>A future release of FocusForge will include a Settings toggle for disabling product analytics. Until then, you can disable Firebase collection entirely by enabling iOS's <strong>"Limit Ad Tracking"</strong> in Settings → Privacy &amp; Security → Advertising. The crash reporting exception is: if you do this, we will not receive crash reports either, which means we may not be able to fix issues you encounter.</p>
+<p>You can disable product analytics at any time via <strong>Settings → Privacy → Send anonymous analytics</strong>. When this is off, FocusForge stops sending analytics events to Firebase at both the application layer and the SDK layer (defense in depth). Crash reports remain on so we can still fix bugs that affect you — those don't contain task names or any content you'd recognize as "what you're working on."</p>
+<p>If you want to disable crash reporting too, enable iOS's <strong>"Limit Ad Tracking"</strong> in Settings → Privacy &amp; Security → Advertising. We don't recommend this because crash data is genuinely how we find and fix problems, but the choice is yours.</p>
 
 <h3>Right to portability</h3>
 <p>The JSON export from <strong>Settings → Export My Progress</strong> is a complete, machine-readable copy of all data we store about your usage. You can use it however you want.</p>

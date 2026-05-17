@@ -10,6 +10,11 @@ struct SettingsView: View {
     @State private var debugSignalText: String = ""
     @State private var debugMilestonePreview: MilestoneReward?
     @AppStorage("debug.forceStreakRescueBanner") private var debugForceStreakRescueBanner = false
+    // Mirrors `AnalyticsService.analyticsEnabledKey`. Default true means
+    // analytics flow until the user explicitly toggles off. Changes here
+    // also need to call `Analytics.setAnalyticsCollectionEnabled(...)` to
+    // disable the Firebase SDK itself (handled via .onChange below).
+    @AppStorage("analytics.enabled") private var analyticsEnabled = true
     @State private var showBackupShare = false
     @State private var backupShareItems: [Any] = []
     @State private var backupError: String?
@@ -101,6 +106,29 @@ struct SettingsView: View {
                         Text("Backup")
                     } footer: {
                         Text("Save a JSON snapshot of your streak, character, inventory, sessions, and quests. Useful before upgrading your phone or wiping data. CloudKit sync arrives in v1.1.")
+                            .foregroundStyle(FFTheme.Text.tertiary)
+                    }
+                    .listRowBackground(Color.white.opacity(0.04))
+
+                    Section {
+                        Toggle(isOn: $analyticsEnabled) {
+                            Label("Send anonymous analytics", systemImage: "chart.bar.fill")
+                                .foregroundStyle(FFTheme.Text.primary)
+                        }
+                        .tint(FFTheme.Accent.blue)
+                        .onChange(of: analyticsEnabled) { _, newValue in
+                            // Toggle the Firebase SDK collection flag in
+                            // sync. AnalyticsService.track() also gates on
+                            // this AppStorage key, but flipping the SDK
+                            // flag stops any analytics-adjacent code paths
+                            // (Crashlytics breadcrumbs, etc.) from
+                            // reaching Firebase too. Defense in depth.
+                            AnalyticsService.setSDKCollectionEnabled(newValue)
+                        }
+                    } header: {
+                        Text("Privacy")
+                    } footer: {
+                        Text("When on, we send anonymous product analytics (which screens you visit, session counts) to help us improve the app. We never send your task names, focus content, or any identifying information. Crash reports stay on either way — they help us fix bugs that affect you.")
                             .foregroundStyle(FFTheme.Text.tertiary)
                     }
                     .listRowBackground(Color.white.opacity(0.04))

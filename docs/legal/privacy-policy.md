@@ -167,12 +167,18 @@ and we'll request deletion through Google's tooling.
 
 ### Right to opt out of analytics
 
-A future release of FocusForge will include a Settings toggle for
-disabling product analytics. Until then, you can disable Firebase
-collection entirely by enabling iOS's **"Limit Ad Tracking"** in
-Settings → Privacy & Security → Advertising. The crash reporting
-exception is: if you do this, we will not receive crash reports either,
-which means we may not be able to fix issues you encounter.
+You can disable product analytics at any time via
+**Settings → Privacy → Send anonymous analytics**. When this is off,
+FocusForge stops sending analytics events to Firebase at both the
+application layer and the SDK layer (defense in depth). Crash reports
+remain on so we can still fix bugs that affect you — those don't
+contain task names or any content you'd recognize as "what you're
+working on."
+
+If you want to disable crash reporting too, enable iOS's
+**"Limit Ad Tracking"** in Settings → Privacy &amp; Security →
+Advertising. We don't recommend this because crash data is genuinely
+how we find and fix problems, but the choice is yours.
 
 ### Right to portability
 

@@ -1,12 +1,19 @@
 import SwiftUI
 import SwiftData
 import FirebaseCore
+import FirebaseAnalytics
 
 @main
 struct FocusForgeApp: App {
     init() {
         FirebaseApp.configure()
         AnalyticsService.backend = FirebaseAnalyticsBackend()
+
+        // Honor the user's analytics opt-out at the Firebase SDK level
+        // too. AnalyticsService.track() also gates on this flag, but
+        // disabling the SDK is the stronger guarantee — even logs that
+        // bypass AnalyticsService won't reach Firebase. Defense in depth.
+        Analytics.setAnalyticsCollectionEnabled(AnalyticsService.isAnalyticsEnabled)
     }
 
     var sharedModelContainer: ModelContainer = {
