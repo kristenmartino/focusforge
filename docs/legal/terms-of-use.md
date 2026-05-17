@@ -208,7 +208,7 @@ United States**, without regard to its conflict of laws principles.
 Any dispute arising out of or related to these Terms or your use of
 FocusForge will be resolved through binding arbitration administered
 by JAMS under its Streamlined Arbitration Rules. The arbitration will
-take place in **Miami-Dade County, Florida**, or by videoconference
+take place in **Palm Beach County, Florida**, or by videoconference
 if you prefer. You and we both waive the right to a jury trial and
 the right to participate in any class action.
 
@@ -273,7 +273,7 @@ We aim to respond to all legal inquiries within 7 business days.
 ## Pre-publication note (resolved 2026-05-17)
 
 Governing law set to **Florida** (state of residence) and arbitration
-venue set to **Miami-Dade County, FL**. CCPA protections still apply
+venue set to **Palm Beach County, FL**. CCPA protections still apply
 to California users regardless of this clause — those rights attach
 to user location, not the governing law choice.
 
