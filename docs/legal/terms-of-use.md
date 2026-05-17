@@ -202,16 +202,15 @@ indemnification, and dispute resolution — will survive.
 
 ## 13. Governing law and disputes
 
-These Terms are governed by the laws of the State of [TBD — needs
-specific US state when ready to publish], United States, without
-regard to its conflict of laws principles.
+These Terms are governed by the laws of the **State of Florida,
+United States**, without regard to its conflict of laws principles.
 
 Any dispute arising out of or related to these Terms or your use of
 FocusForge will be resolved through binding arbitration administered
 by JAMS under its Streamlined Arbitration Rules. The arbitration will
-take place in [TBD city, state], or by videoconference if you prefer.
-You and we both waive the right to a jury trial and the right to
-participate in any class action.
+take place in **Miami-Dade County, Florida**, or by videoconference
+if you prefer. You and we both waive the right to a jury trial and
+the right to participate in any class action.
 
 **Exception for small claims:** Either party may bring an individual
 action in small claims court for disputes within that court's
@@ -271,19 +270,14 @@ We aim to respond to all legal inquiries within 7 business days.
 
 ---
 
-## Important pre-publication note
+## Pre-publication note (resolved 2026-05-17)
 
-Before publishing this document at https://kristenmartino.ai/focusforge/terms,
-the following fields need to be specified:
+Governing law set to **Florida** (state of residence) and arbitration
+venue set to **Miami-Dade County, FL**. CCPA protections still apply
+to California users regardless of this clause — those rights attach
+to user location, not the governing law choice.
 
-1. **§13 governing law:** specific US state (or non-US jurisdiction
-   if applicable)
-2. **§13 arbitration venue:** specific city + state for in-person
-   arbitration
-
-These are deliberately left blank because the choices have legal
-implications that should be made with awareness of where you live,
-where most users are expected to come from, and which state's consumer
-protection regime is most favorable. Common indie-developer choices
-include California (broad consumer protections), Delaware (favorable
-to defendants), or your state of residence (simplest for you).
+If you ever incorporate (LLC, S-Corp) and the entity becomes the party
+to these Terms instead of you personally, revisit §13 and §11
+(indemnification) — the entity choice may justify Delaware jurisdiction
+for liability protection reasons.
