@@ -1,13 +1,13 @@
 # FocusForge
 
-Character-driven Pomodoro app for iPhone that rewards consistent focus with customizable avatars, outfits, and on-device AI coaching.
+Character-driven Pomodoro app for iPhone that rewards consistent focus with customizable avatars, outfits, and on-device, template-based coaching.
 
 ## Why FocusForge
-Most timer apps are functional but emotionally flat. FocusForge combines deep-work structure with progression mechanics so users return daily, protect streaks, and see visible growth in their character.
+FocusForge pairs a Pomodoro timer with character progression, streaks, and optional coaching prompts. Whether those mechanics improve retention or completed focus time remains a beta hypothesis.
 
 ## Status
 
-**MVP build · entering beta.** Sprints 1–5 are complete on `main`: timer engine, sessions, streaks, milestones, XP economy, character cosmetics, dressing room, daily/weekly quests, stats dashboard, AI Coach (intent framing, post-session reflection, streak rescue nudge), Firebase Analytics + Crashlytics, and a dark atmospheric UI redesign with WCAG AA contrast and Reduce Motion support.
+**MVP build · entering beta.** Sprints 1–5 are complete on `main`: timer engine, sessions, streaks, milestones, XP economy, character cosmetics, dressing room, daily/weekly quests, stats dashboard, Coach (intent framing, post-session reflection, streak rescue nudge), Firebase Analytics + Crashlytics, and a dark UI with contrast-oriented design tokens and Reduce Motion support. A full accessibility audit has not been completed.
 
 Sprint 6 is the current focus — TestFlight beta runtime, P0/P1 triage, manual VoiceOver flow verification, and App Store submission.
 
@@ -18,19 +18,19 @@ Sprint 6 is the current focus — TestFlight beta runtime, P0/P1 triage, manual 
 - Inventory and cosmetics economy with rarity tiers (common, rare, animated rare); animated rare items shimmer at thumbnail size
 - Daily and weekly quests with claimable rewards
 - Stats dashboard (today, 7-day with chart, all-time, milestone tracker)
-- On-device AI coaching — template-based, deterministic, no behavioral data leaves the device
+- On-device coaching — deterministic template selection, not LLM inference. Coaching selection runs locally; the app separately integrates Firebase Analytics and Crashlytics, so this is not a claim that all app activity stays on-device
 - Cinematic reward overlay with five-beat staged reveal and tap-to-skip
 - Two-mode design system: focus mode (restraint) and reward mode (richness)
 
 ## Platform
 - v1.0: iPhone (iOS 17+)
-- v1.1: iPad universal layout, CloudKit sync
-- Later: Android and macOS
+- Planned v1.1: iPad universal layout, CloudKit sync
+- Possible later platforms: Android and macOS
 
 ## Product Principles
 - Fast to start: default focus session in ≤2 taps
 - Offline-first core flow
-- AI is assistive, optional, and privacy-first
+- Coaching is optional; analytics and crash reporting have separate data flows
 - Rewards reinforce productivity, not distract from it
 - Accessibility is a launch criterion, not a follow-up
 
@@ -68,10 +68,13 @@ xcodebuild -project FocusForge.xcodeproj -scheme FocusForge \
 
 The `.xcodeproj` is gitignored — `xcodegen generate` rebuilds it from `project.yml` and resolves Firebase SPM packages on first run.
 
-## Initial Success Metrics
+## Proposed beta targets
+
+These are product targets, not measured results or demonstrated effects of coaching.
+
 - D1 retention ≥ 45%
 - D30 retention ≥ 18%
 - 7-day streak attainment ≥ 30%
 - Completed focus minutes per DAU ≥ 50
-- AI suggestion acceptance ≥ 35%
+- Coaching suggestion acceptance ≥ 35%
 - Crash-free sessions ≥ 99.5% in beta

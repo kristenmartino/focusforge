@@ -1,9 +1,11 @@
-# Focus Forge AI Addendum (On-Device, Retention-First)
+# Focus Forge Coaching and AI Proposal
+
+> **Design proposal, not an outcome report.** The current coach selects deterministic templates on-device; it does not run an LLM. Later waves below describe proposed features. Retention and session uplifts are unvalidated targets, not observed effects. Local coaching does not imply that Firebase analytics and crash reporting remain on-device.
 
 ## 1. Objective
 Ship AI features that improve daily return and streak completion without requiring cloud processing of raw task text.
 
-Primary outcomes:
+Proposed outcome targets (not measured):
 - +8-12% 7-day streak attainment
 - +4-6% D30 retention
 - +10% completed sessions per DAU
