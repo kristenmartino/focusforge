@@ -1,247 +1,104 @@
 # FocusForge Privacy Policy
 
 **Effective:** May 15, 2026
-**Last updated:** May 15, 2026
+**Last updated:** October 24, 2026
 
 ## The short version
 
-FocusForge is built so the things that matter to you — your task names,
-when you start sessions, what you focus on — never leave your phone.
-The AI Coach runs entirely on-device. There is no cloud LLM, no
-behavioral profile, no account. We use Firebase for two narrow things:
-crash reports (to fix bugs) and anonymous product analytics (to know
-which screens get used). Both are per-install only and tied to no
-identity we can map back to you.
-
-The long version follows. If anything below is unclear, email
-**privacy@kristenmartino.ai** and we'll explain in plain language.
-
----
+FocusForge stores task names and progress on your device, and its template-based coach runs locally. Firebase Analytics is enabled by default and receives usage events, including session durations and progression details. Firebase Crashlytics collects crash diagnostics and can include copies of those usage events. You can turn analytics off in Settings; crash reporting remains enabled.
 
 ## Who we are
 
-FocusForge is built by Kristen Martino, an independent developer, as a
-solo project. "We" / "us" / "our" in this document refers to Kristen
-Martino, the developer and operator of FocusForge.
+FocusForge is built and operated by Kristen Martino, an independent developer. For privacy questions or requests, email [privacy@kristenmartino.ai](mailto:privacy@kristenmartino.ai).
 
-You can reach us at **privacy@kristenmartino.ai**.
+## Local records and coaching
 
-## What FocusForge collects
+The app stores task names, session history, character and inventory state, streaks, quests, timer settings, and coaching preferences locally using SwiftData. It does not require an account.
 
-We separate this carefully because the categories matter under GDPR,
-CCPA, and Apple's App Tracking Transparency rules.
+The AI Coach selects from written templates on your device. It uses task keywords and local signals such as completion rates, session length, and streak risk. It does not send your task to a hosted language model.
 
-### What FocusForge **never collects**
+The app’s custom analytics events send task-name length, not task-name text or an edited coaching prompt. Some information about your activity is transmitted as described below; local coaching does not make the entire app offline.
 
-The following information **never leaves your iPhone** under any
-circumstances:
+## Product analytics
 
-- Your task names ("Draft Q3 report," "Study for biology exam," etc.)
-- Your focus session content or any text you type into the app
-- Your character customization choices, equipped cosmetics, or inventory
-- Your streak history, completed sessions, or session durations beyond
-  aggregate event counts (see below)
-- Your AI Coach interaction text (the templates the coach shows you, the
-  template you chose, etc.)
-- Anything you'd reasonably call "what you're working on"
-- Your contacts, calendar, photos, location, or any data outside the app
-- Your email, phone number, name, or other identifying details (we
-  don't ask for them; the app has no account system)
-- Your biometric data, health data, or device sensor data
-- Your IP address (Firebase strips this before storing for the events
-  we use)
+Firebase Analytics, provided by Google, is **on by default**. We use it to understand feature use, session completion, and progression. The app sends events with the following kinds of information:
 
-### What FocusForge **does** collect
+- **Sessions:** focus or break phase, planned duration in seconds, actual duration for completed or abandoned sessions, completion fraction for abandonment, and the character count of the trimmed task name.
 
-Everything below runs through Firebase (Crashlytics and Analytics)
-provided by Google. None of it is linked to your identity, and none of
-it includes the content of what you focus on.
+- **Progression:** XP and coins earned, streak days, whether a level increased, skipped days, streak freezes used or remaining, and milestone identifiers.
 
-**Crash reports** — When the app crashes, Crashlytics records:
-- The crash stack trace (which lines of code failed)
-- Your iPhone model and iOS version
-- The app version
-- Anonymous breadcrumbs (which screens were visited in the seconds
-  before the crash, by their internal names — e.g. "timer_view_opened,"
-  not the task names you typed)
+- **Cosmetics:** item identifier, equipment slot, rarity, and coin cost for purchases.
 
-We use crash reports only to find and fix bugs.
+- **Coaching:** prompt type, template identifier or reflection category, whether a suggestion was accepted, edited, or dismissed, reflection feedback, and streak days for rescue nudges. Editing is recorded as a flag; the edited text is not included.
 
-**Anonymous product analytics events** — A small set of events that
-tell us which features get used. Each event is anonymous and attached
-only to a randomly generated **Firebase App Instance ID** that lives on
-your device and resets when you uninstall. The events we send are
-listed in the source code:
-[`AnalyticsService.swift`](https://github.com/kristenmartino/focusforge/blob/main/app/FocusForge/Services/AnalyticsService.swift).
+These are event-level records, not just aggregate counts. Google Analytics also collects SDK-generated information such as app-instance identifiers, device and app information, session statistics, and approximate location. On iOS, its SDK can use the vendor identifier when an advertising identifier is unavailable. See [Google’s Analytics data-collection documentation](https://support.google.com/analytics/answer/11593727?hl=en).
 
-Examples of events sent:
-- `session_started` (with: session type — focus / short break / long break)
-- `session_completed` (with: duration in minutes, planned duration)
-- `session_abandoned` (with: actual focus minutes)
-- `milestone_unlocked` (with: streak day, item rarity)
-- `cosmetic_equipped` (with: item slot, rarity)
-- `streak_lost` / `streak_freeze_used`
-- `ai_prompt_shown` (with: kind — intent / reflection / nudge; template ID)
-- `ai_suggestion_accepted` / `ai_suggestion_dismissed`
+Installation and device identifiers can connect activity across sessions. We do not treat this data as fully anonymous simply because the app does not ask for your name or email address.
 
-These events tell us, in aggregate, things like "23% of users complete
-at least one session on day 7." They cannot be traced back to any
-individual person.
+## Crash reporting and event logs
 
-**Performance diagnostics** — Firebase Performance collects
-non-personal device performance data (e.g. app start time, frame
-rates). Used to identify slowdowns and crashes.
+Firebase Crashlytics collects crash reports automatically. Reports can contain stack traces, app and operating-system versions, device information, installation identifiers, and diagnostic logs. We use these reports to investigate and fix failures.
 
-### What we **don't do** with Firebase
+While analytics is enabled, the app also copies each custom analytics event name and its full parameter dictionary into a Crashlytics log. This means crash reports can include the session durations, reward and streak details, cosmetic identifiers, and coaching interaction metadata listed above. These logs are not limited to screen names.
 
-Apple's App Tracking Transparency requires us to disclose tracking
-across apps and websites. FocusForge does **none** of the following:
+Turning analytics off blocks new custom events through the app’s analytics wrapper, including these copies into Crashlytics logs. **It does not disable Crashlytics itself**, erase logs already recorded, or delete data already sent. Crash reports may be stored on the device and uploaded on a later launch. See [Firebase’s crash-reporting documentation](https://firebase.google.com/docs/crashlytics/ios/customize-crash-reports).
 
-- We do not link Firebase events with third-party data for advertising
-- We do not share data with data brokers
-- We do not use IDFA (Apple's advertising identifier). The Firebase
-  SDK module that accesses IDFA (`GoogleAppMeasurementIdentitySupport`)
-  is intentionally **not included** in our build
-- We do not use Firebase Cloud Messaging for push notifications. All
-  notifications are local-only, generated by `UNUserNotificationCenter`
-  on your phone
-- We do not use Firebase Remote Config for user-targeted experiences
-- We do not use Google Tag Manager
-- We do not embed third-party SDKs from advertising networks,
-  attribution networks, or social platforms
+## Your analytics control
 
-## The AI Coach is on-device
+Open **Settings → Privacy → Send anonymous analytics** and turn the toggle off. This is the control’s current label; the events use the identifiers described above.
 
-The AI Coach in FocusForge is **template-based**. It runs entirely on
-your iPhone using a fixed catalog of hand-written templates routed by
-your behavior. There is **no cloud language model**. The coach engine
-is open source and you can read every line a user might see:
-**https://github.com/kristenmartino/focusforge-coach-engine**
+The preference is saved on the device. The app checks it before forwarding custom events and user properties, and applies it to Firebase Analytics collection at launch and when you change the setting.
 
-When the coach selects a template, the analytics event we send (e.g.
-`ai_prompt_shown`) includes only the template's internal identifier
-(like `frm_code_01`). It does not include your task name or any other
-content.
+**There is currently no in-app switch to disable crash reporting.** iOS advertising or tracking settings are not a control for FocusForge’s Crashlytics collection. Turning analytics off does not remove the app’s other features.
 
-## Where data goes
+## Exports and local deletion
 
-- Crash reports and analytics events go to Firebase (Google) servers
-  in the United States and the European Union depending on Google's
-  routing.
-- We do not sell, rent, or share your data with third parties for
-  marketing.
-- We do not use your data for advertising.
+**Settings → Export My Progress** creates a JSON file containing local progress, including task names and session history, character and inventory state, unlocks, quests, coaching preferences, and timer settings. It is not an export of Firebase Analytics or Crashlytics records.
 
-## How long data is kept
+If you save or share that file through Files, email, AirDrop, or another destination, its contents leave the app at your direction. Your chosen service and device backup settings may retain copies.
 
-- **On your device:** all your local FocusForge data (sessions,
-  streaks, character) is kept until you delete the app. You can export
-  a JSON backup at any time via **Settings → Export My Progress**.
-- **Firebase Crashlytics:** crash reports are retained per Google's
-  default policy (currently 90 days for raw, longer for aggregated).
-- **Firebase Analytics:** event-level data is retained per the
-  retention setting we configured (currently 14 months); aggregated
-  reports are retained indefinitely.
+Deleting the app removes its local app data from the device. It does not delete separately saved exports, device or cloud backups, or information already sent to Google. Uninstalling is not a request to delete server-side analytics or crash reports.
 
-## Your rights
+## Service providers and storage
 
-You have the following rights regardless of where you live:
+Analytics and crash diagnostics are sent to Google’s Firebase and Google Analytics services. Google may process data outside your country, including in the United States. Processing is governed by the applicable Google service and data-processing terms; this policy does not promise a particular storage region.
 
-### Right to access
+We use these integrations for product analytics and crash diagnosis. We do not sell your data or use it to serve advertisements in FocusForge. See [Firebase’s privacy and security information](https://firebase.google.com/support/privacy) for provider details.
 
-You can see exactly what data is on your device by exporting it:
-**Settings → Export My Progress** generates a complete JSON snapshot.
+## Retention
 
-For data on Firebase, email us at **privacy@kristenmartino.ai** and
-we'll request your data subject access report from Google's tooling.
-Since we don't store any identifiers that link to you, the report will
-be limited to whatever is associated with your Firebase App Instance
-ID, which you can find via Apple's privacy report.
+Local records remain on the device until the app’s data is removed. Exports and backups have their own lifetimes in the destinations you choose.
 
-### Right to deletion
+Firebase states that Crashlytics retains crash traces and associated installation identifiers for 90 days before beginning removal from live and backup systems.
 
-Uninstall the app. Your Firebase App Instance ID resets, and any
-analytics or crash data on Firebase that was tied to that ID becomes
-unattributable. You can also email us at **privacy@kristenmartino.ai**
-and we'll request deletion through Google's tooling.
+Google Analytics retention depends on the property’s configured retention controls. Standard aggregate reports are not covered by the same event-level retention limit and may remain longer. Contact us for the current retention period, or read [Google’s retention documentation](https://support.google.com/analytics/answer/7667196?hl=en).
 
-### Right to opt out of analytics
+## Privacy requests
 
-You can disable product analytics at any time via
-**Settings → Privacy → Send anonymous analytics**. When this is off,
-FocusForge stops sending analytics events to Firebase at both the
-application layer and the SDK layer (defense in depth). Crash reports
-remain on so we can still fix bugs that affect you — those don't
-contain task names or any content you'd recognize as "what you're
-working on."
+You can contact [privacy@kristenmartino.ai](mailto:privacy@kristenmartino.ai) to ask about access, correction, deletion, or other privacy rights available where you live. We aim to respond within 7 business days.
 
-If you want to disable crash reporting too, enable iOS's
-**"Limit Ad Tracking"** in Settings → Privacy &amp; Security →
-Advertising. We don't recommend this because crash data is genuinely
-how we find and fix problems, but the choice is yours.
-
-### Right to portability
-
-The JSON export from **Settings → Export My Progress** is a complete,
-machine-readable copy of all data we store about your usage. You can
-use it however you want.
-
-### Right to non-discrimination
-
-We do not differentiate the app's functionality based on whether you
-exercise your privacy rights.
+We may need information to identify the relevant installation or records before handling a request. The app has no account or built-in screen for viewing Firebase identifiers, so an email address alone may not identify your analytics or crash records. Please do not send task contents or exported progress unless needed for your request.
 
 ## Children
 
-FocusForge is not intended for users under 13. We do not knowingly
-collect any data from children under 13. If you believe we have, email
-**privacy@kristenmartino.ai** and we will delete it.
-
-## International users
-
-If you use FocusForge from outside the United States, your data may be
-processed in the United States (where Firebase is headquartered).
-Standard contractual clauses apply for transfers from the European
-Economic Area, the United Kingdom, and Switzerland.
+FocusForge is not intended for children under 13. If you believe a child under 13 has provided personal information through the app, contact [privacy@kristenmartino.ai](mailto:privacy@kristenmartino.ai) so we can investigate and address the request.
 
 ## Changes to this policy
 
-Material changes to this policy will be announced in the app's
-**Settings → About** screen and via a notice on
-https://kristenmartino.ai/focusforge/privacy at least 30 days before
-they take effect. The "Last updated" date at the top of this document
-will reflect the most recent revision.
-
-## Contact
-
-**Email:** privacy@kristenmartino.ai
-
-We aim to respond to all privacy inquiries within 7 business days.
-
----
-
-## Apple App Store Privacy Nutrition Label summary
-
-For Apple's required disclosure:
-
-- **Data Used to Track You:** None
-- **Data Linked to You:** None
-- **Data Not Linked to You:** Device ID (Firebase App Instance ID),
-  Product Interaction (analytics events), Crash Data, Performance Data
-
-The Device ID is per-install and resets when you uninstall.
-
----
+We will update this page and its last-updated date when the policy changes. Material changes will be announced on this page and in the app’s Settings → About screen at least 30 days before taking effect.
 
 ## Source code
 
-FocusForge is built in public. You can review the analytics events we
-send (and confirm we don't send anything else) here:
+The event names, payloads, and collection controls can be reviewed in the app source:
 
-- App source:
-  https://github.com/kristenmartino/focusforge
-- AI Coach engine (open source):
-  https://github.com/kristenmartino/focusforge-coach-engine
+- [Analytics preference and event wrapper](https://github.com/kristenmartino/focusforge/blob/main/app/FocusForge/Services/AnalyticsService.swift)
 
-If you find something in the source that contradicts this policy, that
-is a bug. Email **privacy@kristenmartino.ai** and we will fix it.
+- [Session event payloads](https://github.com/kristenmartino/focusforge/blob/main/app/FocusForge/Services/SessionLogger.swift)
+
+- [Firebase events and Crashlytics logs](https://github.com/kristenmartino/focusforge/blob/main/app/FocusForge/Services/FirebaseAnalyticsBackend.swift)
+
+- [Full app source](https://github.com/kristenmartino/focusforge)
+
+- [On-device coach engine](https://github.com/kristenmartino/focusforge-coach-engine)
+
+The source shows app-defined events; Google’s SDKs also collect the service data described above. If you find a mismatch, please contact [privacy@kristenmartino.ai](mailto:privacy@kristenmartino.ai).

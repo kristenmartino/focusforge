@@ -128,7 +128,7 @@ struct SettingsView: View {
                     } header: {
                         Text("Privacy")
                     } footer: {
-                        Text("When on, we send anonymous product analytics (which screens you visit, session counts) to help us improve the app. We never send your task names, focus content, or any identifying information. Crash reports stay on either way — they help us fix bugs that affect you.")
+                        Text("Analytics is on by default. Events include session durations, streaks, rewards, item IDs, coaching interactions, and task-name length, not task text. Firebase uses installation and device identifiers. While on, event details are also copied into crash logs. Turning this off stops new analytics events; crash reporting stays on and previously recorded logs are not cleared.")
                             .foregroundStyle(FFTheme.Text.tertiary)
                     }
                     .listRowBackground(Color.white.opacity(0.04))
